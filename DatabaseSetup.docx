@@ -1,0 +1,79 @@
+Database Structure voor Mentotschap Cloud
+
+Bedrijven
+- id 
+- Naam
+- Adres
+- telefoonnummer
+- created / updated
+
+Gebruikers
+- id
+- bedrijf
+- Naam
+- email
+- wachtwoord
+- Rol (Admin of User)
+- created / updated
+
+Dossiers
+- id
+- bedrijf
+- algemene_gegevens
+- status
+- Adres
+- contactgegevens
+- persoonsgegevens
+- created
+- created / updated
+
+Rechtbankgegevens
+- id 
+- Dossier_id
+- rechtbank
+- mb / cb nummer
+- datum begin instelling
+- datum einde 
+- created / updated
+
+Taken 
+- id
+- Dossier_id
+- gebruiker_id
+- titel
+- beschrijving
+- status
+- deadline
+- created / updated
+
+Herinneringen
+- id 
+- Dossier_id 
+- gebruiker_id
+- bericht
+- Herinneringendatum
+- created / updated
+
+Dagboek
+- id 
+- Dossier_id
+- gebruiker_id
+- actie
+- created / updated
+
+Logboedk
+- id 
+- Dossier_id
+- gebruiker_id
+- actie 
+- created / updated
+
+De database wordt opgezet met duidelijke relaties tussen de tabellen.
+
+Bedrijven beheren meerdere gebruikers en dossiers.
+Gebruikers zijn gekoppeld aan een bedrijf en hebben een rol (Admin of User).
+Dossiers bevatten gegevens over cliënten en hebben meerdere gekoppelde onderdelen zoals rechtbankgegevens, betrokkenen en taken.
+Taken en herinneringen zijn gekoppeld aan een dossier en worden toegewezen aan een gebruiker.
+Logboek houdt wijzigingen bij om een geschiedenis van acties te bewaren.
+
+
