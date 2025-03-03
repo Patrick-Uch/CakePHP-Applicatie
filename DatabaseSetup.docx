@@ -18,22 +18,29 @@ Gebruikers
 
 Dossiers
 - id
-- bedrijf
-- algemene_gegevens
+- bedrijf_id
 - status
-- Adres
-- contactgegevens
-- persoonsgegevens
-- created
-- created / updated
-
-Rechtbankgegevens
-- id 
-- Dossier_id
-- rechtbank
-- mb / cb nummer
-- datum begin instelling
-- datum einde 
+- Naam
+- Email_1
+- Email_2
+- telefoonnummer_1
+- telefoonnummer_2
+- bsn 
+- iban
+- postadres_straat	
+- postadres_huisnummer
+- postadres_toevoeging
+- postadres_gemeente	
+- postadres_provincie	
+- bezoekadres_straat	
+- bezoekadres_huisnummer
+- bezoekadres_toevoeging
+- bezoekadres_postcode
+- bezoekadres_gemeente	
+- bezoekadres_provincie	
+- rechtbank	
+- mb_cb_nummer
+- encryption_key_id
 - created / updated
 
 Taken 
@@ -58,7 +65,8 @@ Dagboek
 - id 
 - Dossier_id
 - gebruiker_id
-- actie
+- onderwerp
+- text
 - created / updated
 
 Logboedk

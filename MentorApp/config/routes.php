@@ -35,4 +35,10 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/pages/*', 'Pages::display');
         $builder->fallbacks();
     });
+    $routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'index']);
+    $routes->connect('/adressen', ['controller' => 'Adressen', 'action' => 'index']);
+    $routes->connect('/rapporten', ['controller' => 'Rapporten', 'action' => 'index']);
+    $routes->connect('/documenten', ['controller' => 'Documenten', 'action' => 'index']);
+
+    $routes->fallbacks(DashedRoute::class);
 };

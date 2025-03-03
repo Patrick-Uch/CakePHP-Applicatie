@@ -18,6 +18,8 @@ class GebruikersTable extends Table
             'foreignKey' => 'bedrijf_id',
             'joinType' => 'LEFT', 
         ]);
+
+        $this->addBehavior('Timestamp');
     }
 
     public function validationDefault(Validator $validator): Validator
@@ -25,6 +27,7 @@ class GebruikersTable extends Table
         $validator
             ->notEmptyString('naam', 'Naam is required')
             ->notEmptyString('email', 'Email is required')
+            ->lengthBetween('naam', [5, 255], 'Naam must be between 5 and 255 characters')
             ->email('email', false, 'Invalid email format')
             ->notEmptyString('wachtwoord', 'Password is required');
 
