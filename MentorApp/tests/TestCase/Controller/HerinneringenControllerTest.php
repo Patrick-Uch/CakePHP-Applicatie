@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Controller;
 
-use App\Controller\DossiersController;
+use App\Controller\HerinneringenController;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Controller\DossiersController Test Case
+ * App\Controller\HerinneringenController Test Case
  *
- * @uses \App\Controller\DossiersController
+ * @uses \App\Controller\HerinneringenController
  */
-class DossiersControllerTest extends TestCase
+class HerinneringenControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
@@ -22,19 +22,16 @@ class DossiersControllerTest extends TestCase
      * @var list<string>
      */
     protected array $fixtures = [
-        'app.Dossiers',
-        'app.Bedrijfs',
-        'app.Dagboek',
         'app.Herinneringen',
-        'app.Logboek',
-        'app.Taken',
+        'app.Dossiers',
+        'app.Gebruikers',
     ];
 
     /**
      * Test index method
      *
      * @return void
-     * @uses \App\Controller\DossiersController::index()
+     * @uses \App\Controller\HerinneringenController::index()
      */
     public function testIndex(): void
     {
@@ -45,7 +42,7 @@ class DossiersControllerTest extends TestCase
      * Test view method
      *
      * @return void
-     * @uses \App\Controller\DossiersController::view()
+     * @uses \App\Controller\HerinneringenController::view()
      */
     public function testView(): void
     {
@@ -56,7 +53,7 @@ class DossiersControllerTest extends TestCase
      * Test add method
      *
      * @return void
-     * @uses \App\Controller\DossiersController::add()
+     * @uses \App\Controller\HerinneringenController::add()
      */
     public function testAdd(): void
     {
@@ -67,7 +64,7 @@ class DossiersControllerTest extends TestCase
      * Test edit method
      *
      * @return void
-     * @uses \App\Controller\DossiersController::edit()
+     * @uses \App\Controller\HerinneringenController::edit()
      */
     public function testEdit(): void
     {
@@ -78,7 +75,7 @@ class DossiersControllerTest extends TestCase
      * Test delete method
      *
      * @return void
-     * @uses \App\Controller\DossiersController::delete()
+     * @uses \App\Controller\HerinneringenController::delete()
      */
     public function testDelete(): void
     {

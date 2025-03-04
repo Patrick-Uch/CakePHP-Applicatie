@@ -1,3 +1,33 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Ensure images are properly aligned and have consistent sizing */
+.navbar-link img {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.2s ease-in-out;
+}
+.navbar-link:hover img {
+    transform: scale(1.1); 
+}
+.navbar-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+}
+.navbar-link span {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative; 
+}
+.navbar-link.text-blue-600 span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px; 
+    width: 100%;
+    height: 2px;
+    background-color: #3b82f6; 
+    border-radius: 2px;
+}

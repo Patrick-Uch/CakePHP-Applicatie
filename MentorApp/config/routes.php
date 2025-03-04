@@ -1,28 +1,8 @@
 <?php
-/**
- * Routes configuration.
- *
- * In this file, you set up routes to your controllers and their actions.
- * Routes are very important mechanism that allows you to freely connect
- * different URLs to chosen controllers and their actions (functions).
- *
- * It's loaded within the context of `Application::routes()` method which
- * receives a `RouteBuilder` instance `$routes` as method argument.
- *
- * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
- *
- * Licensed under The MIT License
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
- * @link          https://cakephp.org CakePHP(tm) Project
- * @license       https://opensource.org/licenses/mit-license.php MIT License
- */
 
 use Cake\Routing\Route\DashedRoute;
 use Cake\Routing\RouteBuilder;
+use Cake\Routing\Router;
 
 return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
@@ -35,10 +15,27 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/pages/*', 'Pages::display');
         $builder->fallbacks();
     });
-    $routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'index']);
+
+    // Adressen Routes
     $routes->connect('/adressen', ['controller' => 'Adressen', 'action' => 'index']);
+
+    // Rapporten Routes
     $routes->connect('/rapporten', ['controller' => 'Rapporten', 'action' => 'index']);
+
+    // Documenten Routes
     $routes->connect('/documenten', ['controller' => 'Documenten', 'action' => 'index']);
 
+    $routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'view']);
+
+    $routes->connect('/dossiers/{section}', 
+        ['controller' => 'Dossiers', 'action' => 'view'],
+        ['pass' => ['section'], 'section' => '[a-zA-Z0-9_-]+']
+    );
+    
+    $routes->connect('/dossiers/{section}/{subSection}', 
+        ['controller' => 'Dossiers', 'action' => 'view'],
+        ['pass' => ['section', 'subSection'], 'section' => '[a-zA-Z0-9_-]+', 'subSection' => '[a-zA-Z0-9_-]+']
+    );
+    
     $routes->fallbacks(DashedRoute::class);
 };
