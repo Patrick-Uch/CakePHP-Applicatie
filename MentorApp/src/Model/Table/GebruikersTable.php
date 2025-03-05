@@ -5,6 +5,7 @@ namespace App\Model\Table;
 
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Auth\DefaultPasswordHasher;
 
 class GebruikersTable extends Table
 {
@@ -16,7 +17,7 @@ class GebruikersTable extends Table
         $this->setPrimaryKey('id');
         $this->belongsTo('Bedrijven', [
             'foreignKey' => 'bedrijf_id',
-            'joinType' => 'LEFT', 
+            'joinType' => 'LEFT',
         ]);
 
         $this->addBehavior('Timestamp');
@@ -33,5 +34,13 @@ class GebruikersTable extends Table
 
         return $validator;
     }
-}
 
+    public function beforeSave($event, $entity, $options)
+    {
+        if ($entity->isDirty('wachtwoord')) {
+            if (!password_get_info($entity->wachtwoord)['algo']) {
+                $entity->wachtwoord = (new DefaultPasswordHasher())->hash($entity->wachtwoord);
+            }
+        }
+    }
+}
