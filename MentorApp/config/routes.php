@@ -38,4 +38,9 @@ return function (RouteBuilder $routes): void {
     );
     
     $routes->fallbacks(DashedRoute::class);
+
+    $routes->connect('/profile', ['controller' => 'Profile', 'action' => 'profile']);
+    $routes->connect('/profile/settings', ['controller' => 'Profile', 'action' => 'settings']);
+    
+
 };

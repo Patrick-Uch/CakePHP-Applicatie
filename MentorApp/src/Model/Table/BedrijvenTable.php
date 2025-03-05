@@ -22,10 +22,7 @@ class BedrijvenTable extends Table
 
     public function validationDefault(Validator $validator): Validator
     {
-        $validator
-            ->notEmptyString('naam', 'Naam is required');
-
+        $validator->notEmptyString('naam', 'Naam is required');
         return $validator;
     }
 }
-

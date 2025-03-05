@@ -56,11 +56,12 @@
                 <button id="profileDropdownBtn" type="button" class="bg-white rounded-full w-12 h-12 flex items-center justify-center border border-gray-300 shadow-sm focus:outline-none">
                     <i class="fa-solid fa-user text-xl"></i>
                 </button>
-                <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-lg hidden">
-                    <a href="<?= $this->Url->build(['controller' => 'Gebruikers', 'action' => 'profile']) ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                    <a href="<?= $this->Url->build(['controller' => 'Gebruikers', 'action' => 'settings']) ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                    <a href="<?= $this->Url->build(['controller' => 'Gebruikers', 'action' => 'logout']) ?>" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
-                </div>
+                    <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-lg hidden">
+                        <a href="<?= $this->Url->build(['controller' => 'Profile', 'action' => 'profile']) ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                        <a href="<?= $this->Url->build(['controller' => 'Profile', 'action' => 'settings']) ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                        <a href="<?= $this->Url->build(['controller' => 'Gebruikers', 'action' => 'logout']) ?>" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+                    </div>
+
             </div>
         </div>
     </div>

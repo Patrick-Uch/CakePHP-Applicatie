@@ -41,15 +41,19 @@ class GebruikersController extends AppController
     public function login()
     {
         $result = $this->Authentication->getResult();
-        
+    
         if ($this->request->is('post')) {
+            $inputPassword = $this->request->getData('wachtwoord');
+            $user = $this->fetchTable('Gebruikers')->find()->where(['email' => $this->request->getData('email')])->first();
+    
             if ($result->isValid()) {
                 return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
             }
+    
             $this->Flash->error('Ongeldige e-mail of wachtwoord.');
         }
     }
-
+    
     public function logout()
     {
         $this->Authentication->logout();

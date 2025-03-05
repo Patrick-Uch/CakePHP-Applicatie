@@ -55,3 +55,7 @@ yarn-error.log
 # Documentatie
 DatabaseSetup.docx
 Stappenplan.docx
+
+# Debugging & Settings
+settings.json
+debug_login_log.txt
