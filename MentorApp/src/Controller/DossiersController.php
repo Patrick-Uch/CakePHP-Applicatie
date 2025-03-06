@@ -8,11 +8,32 @@ class DossiersController extends AppController
 {
     public function index()
     {
-        $this->viewBuilder()->setLayout('dashboard');
         $query = $this->Dossiers->find()
-            ->contain(['Bedrijven']);
+            ->contain(['Bedrijven']); 
+    
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where(['Dossiers.naam LIKE' => '%' . $search . '%']);
+        }
+    
+        $status = $this->request->getQuery('status');
+        if ($status) {
+            $query->where(['Dossiers.status' => $status]);
+        }
+    
+        $dateFilter = $this->request->getQuery('date_filter');
+        if ($dateFilter) {
+            $currentDate = new \Cake\I18n\FrozenDate();
+            if ($dateFilter == 'Vandaag') {
+                $query->where(['Dossiers.gemaakt_op' => $currentDate]);
+            } elseif ($dateFilter == 'Deze week') {
+                $query->where(['Dossiers.gemaakt_op >=' => $currentDate->startOf('week')]);
+            } elseif ($dateFilter == 'Deze maand') {
+                $query->where(['Dossiers.gemaakt_op >=' => $currentDate->startOf('month')]);
+            }
+        }
+    
         $dossiers = $this->paginate($query);
-
         $this->set(compact('dossiers'));
     }
     public function view(?string $section = null, ?string $subSection = null)
@@ -20,8 +41,13 @@ class DossiersController extends AppController
         $this->viewBuilder()->setLayout('dashboard'); 
     
         if (!$section) {
+            $query = $this->Dossiers->find()->contain(['Bedrijven']);
+            $dossiers = $this->paginate($query);
+            $this->set(compact('dossiers'));
+    
             return $this->render('/Dossiers/Dossier_Dashboard');
         }
+        
         $section = ucfirst(strtolower($section));
         $subSection = $subSection ? ucfirst(strtolower($subSection)) : null;
     
@@ -31,6 +57,7 @@ class DossiersController extends AppController
             'Schulden' => ['Schulden'],
         ];
         $standaloneSections = ['Acties', 'Adressen', 'Mentorschap', 'Notities'];
+    
         if (in_array($section, $standaloneSections)) {
             return $this->render("/Dossiers/$section");
         }
@@ -44,6 +71,7 @@ class DossiersController extends AppController
     
         throw new \Cake\Http\Exception\NotFoundException(__('Page not found'));
     }
+    
     
     
     public function add()

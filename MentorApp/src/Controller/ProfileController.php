@@ -6,6 +6,8 @@ namespace App\Controller;
 use Cake\Event\EventInterface;
 use Cake\ORM\Entity;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
+use Cake\ORM\TableRegistry;
+
 
 class ProfileController extends AppController
 {
@@ -103,6 +105,19 @@ class ProfileController extends AppController
     ]);
 
     $this->set(compact('userEntity'));
+}
+
+public function logboek()
+{
+
+    $this->viewBuilder()->setLayout('dashboard'); 
+
+
+    $logboekTable = TableRegistry::getTableLocator()->get('Logboek');
+    $logboek = $this->paginate($logboekTable->find()->contain(['Dossiers', 'Gebruikers']));
+
+
+    $this->set(compact('logboek'));
 }
 
 }

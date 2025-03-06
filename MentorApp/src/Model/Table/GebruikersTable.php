@@ -16,10 +16,9 @@ class GebruikersTable extends Table
         $this->setTable('gebruikers');
         $this->setPrimaryKey('id');
 
-        // ✅ Ensure it loads the correct company
         $this->belongsTo('Bedrijven', [
             'foreignKey' => 'bedrijf_id',
-            'joinType' => 'INNER', // Change to INNER to require a linked bedrijf
+            'joinType' => 'INNER', 
         ]);
 
         $this->addBehavior('Timestamp');

@@ -15,7 +15,7 @@ class BedrijvenTable extends Table
         $this->setTable('bedrijven'); 
         $this->setPrimaryKey('id');
 
-        $this->hasMany('Gebruikers', [
+        $this->hasMany('Dossiers', [
             'foreignKey' => 'bedrijf_id',
         ]);
     }
