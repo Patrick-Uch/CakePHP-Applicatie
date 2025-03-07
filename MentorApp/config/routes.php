@@ -42,8 +42,4 @@ return function (RouteBuilder $routes): void {
     $routes->connect('/profile', ['controller' => 'Profile', 'action' => 'profile']);
     $routes->connect('/profile/settings', ['controller' => 'Profile', 'action' => 'settings']);    
     $routes->connect('/profile/logboek', ['controller' => 'Profile', 'action' => 'logboek']);
-
-
-
-
 };

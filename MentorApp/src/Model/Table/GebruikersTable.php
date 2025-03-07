@@ -18,7 +18,7 @@ class GebruikersTable extends Table
 
         $this->belongsTo('Bedrijven', [
             'foreignKey' => 'bedrijf_id',
-            'joinType' => 'INNER', 
+            'joinType' => 'LEFT', 
         ]);
 
         $this->addBehavior('Timestamp');

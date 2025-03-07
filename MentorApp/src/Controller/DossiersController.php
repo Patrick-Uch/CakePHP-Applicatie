@@ -36,7 +36,7 @@ class DossiersController extends AppController
         $dossiers = $this->paginate($query);
         $this->set(compact('dossiers'));
     }
-    public function view(?string $section = null, ?string $subSection = null)
+    public function view(?string $section = null, ?string $subSection = null, ?int $id = null)
     {
         $this->viewBuilder()->setLayout('dashboard'); 
     
@@ -47,7 +47,7 @@ class DossiersController extends AppController
     
             return $this->render('/Dossiers/Dossier_Dashboard');
         }
-        
+    
         $section = ucfirst(strtolower($section));
         $subSection = $subSection ? ucfirst(strtolower($subSection)) : null;
     
@@ -58,19 +58,27 @@ class DossiersController extends AppController
         ];
         $standaloneSections = ['Acties', 'Adressen', 'Mentorschap', 'Notities'];
     
+        if ($id) {
+            $dossier = $this->Dossiers->get($id, ['contain' => ['Bedrijven']]);
+            $this->set(compact('dossier'));
+        }
+    
         if (in_array($section, $standaloneSections)) {
             return $this->render("/Dossiers/$section");
         }
+    
         if (isset($validSections[$section]) && !$subSection) {
             $firstSubPage = $validSections[$section][0];
-            return $this->redirect(["controller" => "Dossiers", "action" => "view", $section, $firstSubPage]);
+            return $this->redirect(["controller" => "Dossiers", "action" => "view", $section, $firstSubPage, $id]);
         }
+    
         if (isset($validSections[$section]) && in_array($subSection, $validSections[$section])) {
             return $this->render("/Dossiers/$section/$subSection");
         }
     
         throw new \Cake\Http\Exception\NotFoundException(__('Page not found'));
     }
+    
     
     
     
