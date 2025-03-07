@@ -3,7 +3,7 @@
 
     <div class="mt-4">
         <label class="block text-sm font-medium text-gray-700">Bedrijf</label>
-        <input type="text" value="<?= h($userEntity->bedrijf ? $userEntity->bedrijf->naam : 'Geen bedrijf gekoppeld') ?>" class="mt-1 p-2 w-full border rounded-lg bg-gray-100" disabled>
+        <input type="text" value="<?= h($userEntity->bedrijven->naam ?? 'Geen bedrijf gekoppeld') ?>" class="mt-1 p-2 w-full border rounded-lg bg-gray-100" disabled>
     </div>
 
     <div class="mt-4">

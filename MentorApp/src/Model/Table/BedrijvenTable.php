@@ -15,17 +15,14 @@ class BedrijvenTable extends Table
         $this->setTable('bedrijven'); 
         $this->setPrimaryKey('id');
 
-        $this->hasMany('Gebruikers', [
+        $this->hasMany('Dossiers', [
             'foreignKey' => 'bedrijf_id',
         ]);
     }
 
     public function validationDefault(Validator $validator): Validator
     {
-        $validator
-            ->notEmptyString('naam', 'Naam is required');
-
+        $validator->notEmptyString('naam', 'Naam is required');
         return $validator;
     }
 }
-

@@ -8,26 +8,6 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
-/**
- * Logboek Model
- *
- * @property \App\Model\Table\DossiersTable&\Cake\ORM\Association\BelongsTo $Dossiers
- * @property \App\Model\Table\GebruikersTable&\Cake\ORM\Association\BelongsTo $Gebruikers
- *
- * @method \App\Model\Entity\Logboek newEmptyEntity()
- * @method \App\Model\Entity\Logboek newEntity(array $data, array $options = [])
- * @method array<\App\Model\Entity\Logboek> newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Logboek get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
- * @method \App\Model\Entity\Logboek findOrCreate($search, ?callable $callback = null, array $options = [])
- * @method \App\Model\Entity\Logboek patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method array<\App\Model\Entity\Logboek> patchEntities(iterable $entities, array $data, array $options = [])
- * @method \App\Model\Entity\Logboek|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method \App\Model\Entity\Logboek saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method iterable<\App\Model\Entity\Logboek>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Logboek>|false saveMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Logboek>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Logboek> saveManyOrFail(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Logboek>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Logboek>|false deleteMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Logboek>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Logboek> deleteManyOrFail(iterable $entities, array $options = [])
- */
 class LogboekTable extends Table
 {
     /**

@@ -59,6 +59,7 @@
                     <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 shadow-md rounded-lg hidden">
                         <a href="<?= $this->Url->build(['controller' => 'Profile', 'action' => 'profile']) ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
                         <a href="<?= $this->Url->build(['controller' => 'Profile', 'action' => 'settings']) ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                        <a href="<?= $this->Url->build(['controller' => 'Profile', 'action' => 'Logboek']) ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logboek</a>
                         <a href="<?= $this->Url->build(['controller' => 'Gebruikers', 'action' => 'logout']) ?>" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
                     </div>
 

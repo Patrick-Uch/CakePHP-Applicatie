@@ -5,7 +5,7 @@ namespace App\Model\Table;
 
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-use Cake\Auth\DefaultPasswordHasher;
+use Cake\Utility\DefaultPasswordHasher;
 
 class GebruikersTable extends Table
 {
@@ -15,9 +15,10 @@ class GebruikersTable extends Table
 
         $this->setTable('gebruikers');
         $this->setPrimaryKey('id');
+
         $this->belongsTo('Bedrijven', [
             'foreignKey' => 'bedrijf_id',
-            'joinType' => 'LEFT',
+            'joinType' => 'INNER', 
         ]);
 
         $this->addBehavior('Timestamp');

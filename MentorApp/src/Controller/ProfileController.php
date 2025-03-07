@@ -6,6 +6,8 @@ namespace App\Controller;
 use Cake\Event\EventInterface;
 use Cake\ORM\Entity;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
+use Cake\ORM\TableRegistry;
+
 
 class ProfileController extends AppController
 {
@@ -24,17 +26,23 @@ class ProfileController extends AppController
             return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
         }
     
-        $userEntity = $this->fetchTable('Gebruikers')->get($user->getIdentifier(), [
-            'contain' => ['Bedrijven']
-        ]);
-
+        $userEntity = $this->fetchTable('Gebruikers')->find()
+            ->where(['Gebruikers.id' => $user->getIdentifier()])
+            ->contain(['Bedrijven']) 
+            ->first();
+    
+        if (!$userEntity) {
+            $this->Flash->error(__('Gebruiker niet gevonden.'));
+            return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
+        }
+    
         if ($this->request->is(['post', 'put'])) {
             $userEntity = $this->fetchTable('Gebruikers')->patchEntity($userEntity, $this->request->getData(), ['fields' => ['naam', 'email']]);
             if ($this->fetchTable('Gebruikers')->save($userEntity)) {
-                $this->Flash->success(__('Profile updated successfully.'));
+                $this->Flash->success(__('Profiel succesvol bijgewerkt.'));
                 return $this->redirect(['action' => 'profile']);
             } else {
-                $this->Flash->error(__('Error updating profile. Please try again.'));
+                $this->Flash->error(__('Fout bij het bijwerken van het profiel.'));
             }
         }
     
@@ -82,4 +90,34 @@ class ProfileController extends AppController
             return $this->redirect(['action' => 'profile']);
         }
     }
+
+    public function settings()
+{
+    $this->viewBuilder()->setLayout('dashboard');
+
+    $user = $this->Authentication->getIdentity();
+    if (!$user) {
+        return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
+    }
+
+    $userEntity = $this->fetchTable('Gebruikers')->get($user->getIdentifier(), [
+        'contain' => ['Bedrijven']
+    ]);
+
+    $this->set(compact('userEntity'));
+}
+
+public function logboek()
+{
+
+    $this->viewBuilder()->setLayout('dashboard'); 
+
+
+    $logboekTable = TableRegistry::getTableLocator()->get('Logboek');
+    $logboek = $this->paginate($logboekTable->find()->contain(['Dossiers', 'Gebruikers']));
+
+
+    $this->set(compact('logboek'));
+}
+
 }

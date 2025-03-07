@@ -19,6 +19,7 @@ class LogboekController extends AppController
     {
         $query = $this->Logboek->find()
             ->contain(['Dossiers', 'Gebruikers']);
+        
         $logboek = $this->paginate($query);
 
         $this->set(compact('logboek'));
@@ -33,7 +34,7 @@ class LogboekController extends AppController
      */
     public function view($id = null)
     {
-        $logboek = $this->Logboek->get($id, contain: ['Dossiers', 'Gebruikers']);
+        $logboek = $this->Logboek->get($id, ['contain' => ['Dossiers', 'Gebruikers']]);
         $this->set(compact('logboek'));
     }
 
@@ -45,17 +46,22 @@ class LogboekController extends AppController
     public function add()
     {
         $logboek = $this->Logboek->newEmptyEntity();
+        
         if ($this->request->is('post')) {
             $logboek = $this->Logboek->patchEntity($logboek, $this->request->getData());
+
             if ($this->Logboek->save($logboek)) {
                 $this->Flash->success(__('The logboek has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
+
             $this->Flash->error(__('The logboek could not be saved. Please, try again.'));
         }
-        $dossiers = $this->Logboek->Dossiers->find('list', limit: 200)->all();
-        $gebruikers = $this->Logboek->Gebruikers->find('list', limit: 200)->all();
+
+        $dossiers = $this->Logboek->Dossiers->find('list', ['limit' => 200])->all();
+        $gebruikers = $this->Logboek->Gebruikers->find('list', ['limit' => 200])->all();
+
         $this->set(compact('logboek', 'dossiers', 'gebruikers'));
     }
 
@@ -68,18 +74,23 @@ class LogboekController extends AppController
      */
     public function edit($id = null)
     {
-        $logboek = $this->Logboek->get($id, contain: []);
+        $logboek = $this->Logboek->get($id);
+        
         if ($this->request->is(['patch', 'post', 'put'])) {
             $logboek = $this->Logboek->patchEntity($logboek, $this->request->getData());
+
             if ($this->Logboek->save($logboek)) {
                 $this->Flash->success(__('The logboek has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
+
             $this->Flash->error(__('The logboek could not be saved. Please, try again.'));
         }
-        $dossiers = $this->Logboek->Dossiers->find('list', limit: 200)->all();
-        $gebruikers = $this->Logboek->Gebruikers->find('list', limit: 200)->all();
+
+        $dossiers = $this->Logboek->Dossiers->find('list', ['limit' => 200])->all();
+        $gebruikers = $this->Logboek->Gebruikers->find('list', ['limit' => 200])->all();
+
         $this->set(compact('logboek', 'dossiers', 'gebruikers'));
     }
 
@@ -93,7 +104,9 @@ class LogboekController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
+
         $logboek = $this->Logboek->get($id);
+
         if ($this->Logboek->delete($logboek)) {
             $this->Flash->success(__('The logboek has been deleted.'));
         } else {
