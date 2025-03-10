@@ -79,16 +79,7 @@
             <?= $this->fetch('content') ?>
         </main>
     </div>
-
-    <footer class="bg-white shadow fixed bottom-0 w-full">
-        <div class="max-w-8xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-500">© 2025 Mentor App. All rights reserved.</div>
-                <div class="text-sm text-gray-500">Version 0.0.2</div>
-            </div>
-        </div>
-    </footer>
-
+    
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const profileBtn = document.getElementById("profileDropdownBtn");

@@ -14,10 +14,10 @@ class DossiersTable extends Table
 
         $this->setTable('dossiers');
         $this->setPrimaryKey('id');  
-
         $this->belongsTo('Bedrijven', [
-            'foreignKey' => 'bedrijf_id',  
-            'joinType' => 'INNER',         
+            'className' => 'Bedrijven',
+            'foreignKey' => 'bedrijf_id',
+            'joinType' => 'LEFT', 
         ]);
 
         $this->hasMany('Dagboek', [

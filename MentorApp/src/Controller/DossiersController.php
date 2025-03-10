@@ -3,12 +3,15 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-
 class DossiersController extends AppController
 {
     public function index()
     {
-        $query = $this->Dossiers->find()
+        $this->viewBuilder()->setLayout('dashboard'); 
+    
+        $dossiersTable = $this->fetchTable('Dossiers');
+    
+        $query = $dossiersTable->find()
             ->contain(['Bedrijven']); 
     
         $search = $this->request->getQuery('search');
@@ -35,7 +38,10 @@ class DossiersController extends AppController
     
         $dossiers = $this->paginate($query);
         $this->set(compact('dossiers'));
+    
+        return $this->render('/Dossiers/dossier_dashboard'); 
     }
+    
     public function view(?string $section = null, ?string $subSection = null, ?int $id = null)
     {
         $this->viewBuilder()->setLayout('dashboard'); 
@@ -78,52 +84,4 @@ class DossiersController extends AppController
     
         throw new \Cake\Http\Exception\NotFoundException(__('Page not found'));
     }
-    
-    
-    
-    
-    public function add()
-    {
-        $dossier = $this->Dossiers->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $dossier = $this->Dossiers->patchEntity($dossier, $this->request->getData());
-            if ($this->Dossiers->save($dossier)) {
-                $this->Flash->success(__('The dossier has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The dossier could not be saved. Please, try again.'));
-        }
-        $bedrijven = $this->Dossiers->Bedrijven->find('list', limit: 200)->all();
-        $this->set(compact('dossier', 'bedrijven'));
-    }
-    public function edit($id = null)
-    {
-        $dossier = $this->Dossiers->get($id, contain: []);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $dossier = $this->Dossiers->patchEntity($dossier, $this->request->getData());
-            if ($this->Dossiers->save($dossier)) {
-                $this->Flash->success(__('The dossier has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The dossier could not be saved. Please, try again.'));
-        }
-        $bedrijven = $this->Dossiers->bedrijven->find('list', limit: 200)->all();
-        $this->set(compact('dossier', 'bedrijven'));
-    }
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $dossier = $this->Dossiers->get($id);
-        if ($this->Dossiers->delete($dossier)) {
-            $this->Flash->success(__('The dossier has been deleted.'));
-        } else {
-            $this->Flash->error(__('The dossier could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
-    }
-
-    
 }

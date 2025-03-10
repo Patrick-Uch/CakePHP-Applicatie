@@ -25,7 +25,7 @@ return function (RouteBuilder $routes): void {
     // Documenten Routes
     $routes->connect('/documenten', ['controller' => 'Documenten', 'action' => 'index']);
 
-    $routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'view']);
+    $routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'index']);
 
     $routes->connect('/dossiers/{section}', 
         ['controller' => 'Dossiers', 'action' => 'view'],
