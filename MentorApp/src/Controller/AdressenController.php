@@ -8,7 +8,7 @@ class AdressenController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->viewBuilder()->setLayout('dashboard'); // Use dashboard layout
+        $this->viewBuilder()->setLayout('dashboard'); // gebruik dashboard layout
     }
 
     public function index()

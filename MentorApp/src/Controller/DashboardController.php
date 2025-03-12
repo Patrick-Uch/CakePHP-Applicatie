@@ -28,7 +28,7 @@ class DashboardController extends AppController
             return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
         }
     
-        $this->viewBuilder()->setLayout('dashboard'); // Use the dashboard layout
+        $this->viewBuilder()->setLayout('dashboard'); // gebruik dashboard layout
         $this->set('user', $user);
     }
     

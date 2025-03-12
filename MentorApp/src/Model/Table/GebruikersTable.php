@@ -6,6 +6,8 @@ namespace App\Model\Table;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 use Cake\Utility\DefaultPasswordHasher;
+use Cake\Event\EventInterface;
+use ArrayObject;
 
 class GebruikersTable extends Table
 {
@@ -13,33 +15,28 @@ class GebruikersTable extends Table
     {
         parent::initialize($config);
 
+        // Naam database tabel
         $this->setTable('gebruikers');
+
+        // Primaire key
         $this->setPrimaryKey('id');
 
+        // Relatie: Elke gebruiker behoort tot één bedrijf
         $this->belongsTo('Bedrijven', [
             'foreignKey' => 'bedrijf_id',
-            'joinType' => 'LEFT', 
+            'joinType' => 'LEFT', // LEFT JOIN zodat een gebruiker geen bedrijf kan hebben
         ]);
 
+        // Timestamp-behavior toevoegen (voegt automatisch created & modified velden toe)
         $this->addBehavior('Timestamp');
     }
 
-    public function validationDefault(Validator $validator): Validator
+    // Voor het opslaan: controleer of het wachtwoord gewijzigd is en hash het zo nodig
+    public function beforeSave(EventInterface $event, $entity, ArrayObject $options)
     {
-        $validator
-            ->notEmptyString('naam', 'Naam is required')
-            ->notEmptyString('email', 'Email is required')
-            ->lengthBetween('naam', [5, 255], 'Naam must be between 5 and 255 characters')
-            ->email('email', false, 'Invalid email format')
-            ->notEmptyString('wachtwoord', 'Password is required');
-
-        return $validator;
-    }
-
-    public function beforeSave($event, $entity, $options)
-    {
-        if ($entity->isDirty('wachtwoord')) {
-            if (!password_get_info($entity->wachtwoord)['algo']) {
+        if ($entity->isDirty('wachtwoord')) { 
+            // Controleer of het wachtwoord al gehasht is
+            if (!password_get_info((string)$entity->wachtwoord)['algo']) {
                 $entity->wachtwoord = (new DefaultPasswordHasher())->hash($entity->wachtwoord);
             }
         }

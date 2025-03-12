@@ -34,7 +34,7 @@
         <?php } ?>
     </ul>
 
-    <!-- Other Pages -->
+    <!-- Andere Pages -->
     <?php
     $pages = ['Notities', 'Acties', 'Mentorschap', 'Adressen'];
     foreach ($pages as $page) {

@@ -30,8 +30,6 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     {
         parent::bootstrap();
 
-        // $this->addPlugin('Authentication');
-
         if (PHP_SAPI !== 'cli') {
             FactoryLocator::add(
                 'Table',
@@ -84,7 +82,6 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     
         return $service;
     }
-    
 
     public function services(ContainerInterface $container): void
     {

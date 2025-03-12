@@ -11,14 +11,6 @@
         <h3 class="text-lg font-semibold text-gray-900 mb-3">Geüploade Documenten</h3>
         <div id="document-list">
             <div class="document-entry flex justify-between items-center p-4 border-b">
-                <div>
-                    <p class="text-gray-900 font-medium">Test12345.pdf</p>
-                    <p class="text-gray-500 text-sm">Geüpload op: 04-03-2025</p>
-                </div>
-                <div class="flex gap-3">
-                    <a href="#" class="text-blue-600 hover:underline">Download</a>
-                    <button class="text-red-600 hover:underline delete-btn">Verwijderen</button>
-                </div>
             </div>
         </div>
     </div>

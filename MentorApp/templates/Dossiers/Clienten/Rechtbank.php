@@ -21,11 +21,7 @@
                 </div>
             </div>
         </div>
-
-        <button type="button" id="add-rechtbank" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
-            Nog een toevoegen
-        </button>
-
+        
         <div class="mt-6">
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                 Opslaan
@@ -34,13 +30,3 @@
     </form>
 </div>
 
-<script>
-    document.getElementById('add-rechtbank').addEventListener('click', function () {
-        let container = document.getElementById('rechtbank-container');
-        let newEntry = document.querySelector('.rechtbank-entry').cloneNode(true);
-        
-        newEntry.querySelectorAll('input').forEach(input => input.value = '');
-        
-        container.appendChild(newEntry);
-    });
-</script>

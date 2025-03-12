@@ -80,7 +80,7 @@
         </main>
     </div>
     
-    <script>
+    <script> // Profile Dropdown 
     document.addEventListener("DOMContentLoaded", function () {
         const profileBtn = document.getElementById("profileDropdownBtn");
         const dropdownMenu = document.getElementById("profileDropdownMenu");
