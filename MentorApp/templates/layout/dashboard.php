@@ -76,6 +76,7 @@
 
     <div class="relative ml-64 flex-1 mt-20">
         <main class="h-full py-6 px-4 sm:px-6 lg:px-8">
+            <?= $this->Flash->render() ?>
             <?= $this->fetch('content') ?>
         </main>
     </div>

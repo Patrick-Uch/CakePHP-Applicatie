@@ -25,11 +25,8 @@ class DossiersTableTest extends TestCase
      */
     protected array $fixtures = [
         'app.Dossiers',
-        'app.Bedrijfs',
+        'app.Bedrijven',
         'app.Dagboek',
-        'app.Herinneringen',
-        'app.Logboek',
-        'app.Taken',
     ];
 
     /**
@@ -63,17 +60,6 @@ class DossiersTableTest extends TestCase
      * @uses \App\Model\Table\DossiersTable::validationDefault()
      */
     public function testValidationDefault(): void
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
-
-    /**
-     * Test buildRules method
-     *
-     * @return void
-     * @uses \App\Model\Table\DossiersTable::buildRules()
-     */
-    public function testBuildRules(): void
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

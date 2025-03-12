@@ -52,8 +52,8 @@ class DossiersFixture extends TestFixture
                 'betrokkenen_postcode' => 'Lorem ipsum dolor ',
                 'betrokkenen_gemeente' => 'Lorem ipsum dolor sit amet',
                 'encryption_key_id' => 'Lorem ipsum dolor sit amet',
-                'gemaakt_op' => 1741090485,
-                'geupdate_op' => 1741090485,
+                'gemaakt_op' => 1741781670,
+                'geupdate_op' => 1741781670,
             ],
         ];
         parent::init();

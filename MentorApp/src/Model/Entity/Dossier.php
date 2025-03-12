@@ -44,16 +44,19 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime $gemaakt_op
  * @property \Cake\I18n\DateTime $geupdate_op
  *
- * @property \App\Model\Entity\Bedrijven $bedrijf
+ * @property \App\Model\Entity\Bedrijven $bedrijven
  * @property \App\Model\Entity\Dagboek[] $dagboek
- * @property \App\Model\Entity\Herinneringen[] $herinneringen
- * @property \App\Model\Entity\Logboek[] $logboek
- * @property \App\Model\Entity\Taken[] $taken
  */
 class Dossier extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
+     *
+     * Note that when '*' is set to true, this allows all unspecified fields to
+     * be mass assigned. For security purposes, it is advised to set '*' to false
+     * (or remove it), and explicitly make individual fields accessible as needed.
+     *
+     * @var array<string, bool>
      */
     protected array $_accessible = [
         'bedrijf_id' => true,
@@ -90,18 +93,7 @@ class Dossier extends Entity
         'encryption_key_id' => true,
         'gemaakt_op' => true,
         'geupdate_op' => true,
-        'bedrijf' => true,
+        'bedrijven' => true,
         'dagboek' => true,
-        'herinneringen' => true,
-        'logboek' => true,
-        'taken' => true,
     ];
-
-    /**
-     * Get the company name for the Dossier
-     */
-    public function getBedrijfNaam()
-    {
-        return $this->bedrijf ? $this->bedrijf->naam : 'Geen bedrijf gekoppeld';
-    }
 }

@@ -2,65 +2,106 @@
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Dossier $dossier
- * @var string[]|\Cake\Collection\CollectionInterface $bedrijfs
+ * @var string[]|\Cake\Collection\CollectionInterface $bedrijven
  */
 ?>
-<div class="row">
-    <aside class="column">
-        <div class="side-nav">
-            <h4 class="heading"><?= __('Actions') ?></h4>
-            <?= $this->Form->postLink(
-                __('Delete'),
-                ['action' => 'delete', $dossier->id],
-                ['confirm' => __('Are you sure you want to delete # {0}?', $dossier->id), 'class' => 'side-nav-item']
-            ) ?>
-            <?= $this->Html->link(__('List Dossiers'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-semibold text-gray-900">Dossier Bewerken</h1>
+        <p class="text-gray-600">Hier kun je de gegevens van het dossier wijzigen.</p>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <?= $this->Form->create($dossier, ['class' => 'space-y-6']) ?>
+
+        <!-- Bedrijf & Status -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <?= $this->Form->control('bedrijf_id', [
+                    'options' => $bedrijven,
+                    'class' => 'w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500',
+                    'label' => ['text' => __('Bedrijf'), 'class' => 'block text-sm font-medium text-gray-700']
+                ]) ?>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <?= $this->Form->control('status', [
+                    'options' => ['Opstarten' => 'Opstarten', 'Actief' => 'Actief', 'In beëindiging' => 'In beëindiging', 'Afgesloten' => 'Afgesloten'],
+                    'class' => 'w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500',
+                    'label' => ['text' => __('Status'), 'class' => 'block text-sm font-medium text-gray-700']
+                ]) ?>
+            </div>
         </div>
-    </aside>
-    <div class="column column-80">
-        <div class="dossiers form content">
-            <?= $this->Form->create($dossier) ?>
-            <fieldset>
-                <legend><?= __('Edit Dossier') ?></legend>
-                <?php
-                    echo $this->Form->control('bedrijf_id', ['options' => $bedrijven]);
-                    echo $this->Form->control('status');
-                    echo $this->Form->control('naam');
-                    echo $this->Form->control('email_1');
-                    echo $this->Form->control('email_2');
-                    echo $this->Form->control('telefoonnummer_1');
-                    echo $this->Form->control('telefoonnummer_2');
-                    echo $this->Form->control('bsn');
-                    echo $this->Form->control('iban');
-                    echo $this->Form->control('postadres_straat');
-                    echo $this->Form->control('postadres_huisnummer');
-                    echo $this->Form->control('postadres_toevoeging');
-                    echo $this->Form->control('postadres_gemeente');
-                    echo $this->Form->control('postadres_provincie');
-                    echo $this->Form->control('bezoekadres_straat');
-                    echo $this->Form->control('bezoekadres_huisnummer');
-                    echo $this->Form->control('bezoekadres_toevoeging');
-                    echo $this->Form->control('bezoekadres_postcode');
-                    echo $this->Form->control('bezoekadres_gemeente');
-                    echo $this->Form->control('bezoekadres_provincie');
-                    echo $this->Form->control('rechtbank');
-                    echo $this->Form->control('mb_cb_nummer');
-                    echo $this->Form->control('betrokkenen_relatie');
-                    echo $this->Form->control('betrokkenen_voor_achternaam');
-                    echo $this->Form->control('betrokkenen_telefoonnummer');
-                    echo $this->Form->control('betrokkenen_email');
-                    echo $this->Form->control('betrokkenen_straat');
-                    echo $this->Form->control('betrokkenen_huisnummer');
-                    echo $this->Form->control('betrokkenen_toevoeging');
-                    echo $this->Form->control('betrokkenen_postcode');
-                    echo $this->Form->control('betrokkenen_gemeente');
-                    echo $this->Form->control('encryption_key_id');
-                    echo $this->Form->control('gemaakt_op');
-                    echo $this->Form->control('geupdate_op');
-                ?>
-            </fieldset>
-            <?= $this->Form->button(__('Submit')) ?>
-            <?= $this->Form->end() ?>
+
+        <!-- Persoonlijke Gegevens -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Persoonlijke Gegevens</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <?= $this->Form->control('naam', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bsn', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('iban', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('email_1', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('email_2', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('telefoonnummer_1', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('telefoonnummer_2', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+            </div>
         </div>
+
+        <!-- Rechtbank Gegevens -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Rechtbank Gegevens</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <?= $this->Form->control('rechtbank', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('mb_cb_nummer', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+            </div>
+        </div>
+
+        <!-- Adresgegevens -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Adresgegevens</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <?= $this->Form->control('postadres_straat', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('postadres_huisnummer', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('postadres_toevoeging', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('postadres_postcode', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('postadres_gemeente', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('postadres_provincie', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bezoekadres_straat', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bezoekadres_huisnummer', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bezoekadres_toevoeging', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bezoekadres_postcode', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bezoekadres_gemeente', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bezoekadres_provincie', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+            </div>
+        </div>
+
+        <!-- Betrokkenen -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Betrokkenen</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <?= $this->Form->control('betrokkenen_relatie', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_voor_achternaam', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_telefoonnummer', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_email', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_straat', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_huisnummer', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_toevoeging', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_postcode', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('betrokkenen_gemeente', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+            </div>
+        </div>
+
+        <!-- Actieknoppen -->
+        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-300">
+            <a href="<?= $this->Url->build(['controller' => 'Dossiers', 'action' => 'index']) ?>" 
+               class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+                Annuleren
+            </a>
+            <?= $this->Form->button(__('Opslaan'), [
+                'class' => 'px-4 py-2 bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 rounded-lg'
+            ]) ?>
+        </div>
+
+        <?= $this->Form->end() ?>
     </div>
 </div>

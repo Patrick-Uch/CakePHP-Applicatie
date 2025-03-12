@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Utility\Security;
+use Cake\Http\Exception\NotFoundException;
+
 class DossiersController extends AppController
 {
     public function index()
@@ -68,6 +71,77 @@ class DossiersController extends AppController
         }
     
         // Toon een foutmelding als de pagina niet bestaat
-        throw new \Cake\Http\Exception\NotFoundException(__('Pagina niet gevonden'));
+        throw new NotFoundException(__('Pagina niet gevonden'));
+    }
+
+    /**
+     * Bewerken van een dossier.
+     */
+    public function edit($id = null)
+    {
+        $this->viewBuilder()->setLayout('dashboard'); // Gebruik dashboard layout
+
+        $dossier = $this->Dossiers->get($id, ['contain' => ['Bedrijven']]);
+        $bedrijven = $this->Dossiers->Bedrijven->find('list', ['limit' => 200])->all();
+    
+        // Decrypt de velden voordat ze worden weergegeven in het formulier
+        if (!empty($dossier->bsn)) {
+            $dossier->bsn = $this->decryptData($dossier->bsn);
+        }
+        if (!empty($dossier->iban)) {
+            $dossier->iban = $this->decryptData($dossier->iban);
+        }
+    
+        if ($this->getRequest()->is(['post', 'put', 'patch'])) {
+            $data = $this->getRequest()->getData();
+    
+            // Encrypt de gevoelige velden voordat ze worden opgeslagen
+            if (!empty($data['bsn'])) {
+                $data['bsn'] = $this->encryptData($data['bsn']);
+            }
+            if (!empty($data['iban'])) {
+                $data['iban'] = $this->encryptData($data['iban']);
+            }
+    
+            $dossier = $this->Dossiers->patchEntity($dossier, $data);
+    
+            // Zorg ervoor dat CakePHP de velden als gewijzigd herkent
+            $dossier->setDirty('bsn', true);
+            $dossier->setDirty('iban', true);
+    
+            // Opslaan in de database
+            if ($this->Dossiers->save($dossier)) {
+                $this->Flash->success('Dossier is succesvol bijgewerkt.');
+                return $this->redirect(['action' => 'index']);
+            } else {
+                $this->Flash->error('Dossier kon niet worden bijgewerkt. Probeer opnieuw.');
+            }
+        }
+    
+        $this->set(compact('dossier', 'bedrijven'));
+    }
+
+    private function encryptData($value)
+    {
+        if (empty($value)) {
+            return null; // Niet encrypten als er geen waarde is
+        }
+
+        $key = Security::getSalt(); // Gebruik CakePHP's security key
+        $iv = substr($key, 0, 16); // IV moet precies 16 bytes zijn
+
+        return base64_encode(openssl_encrypt($value, 'AES-256-CBC', $key, 0, $iv));
+    }
+
+    private function decryptData($value)
+    {
+        if (empty($value)) {
+            return null; // Niet decrypten als er geen waarde is
+        }
+
+        $key = Security::getSalt();
+        $iv = substr($key, 0, 16);
+
+        return openssl_decrypt(base64_decode($value), 'AES-256-CBC', $key, 0, $iv);
     }
 }

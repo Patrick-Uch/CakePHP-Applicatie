@@ -26,9 +26,9 @@ return function (RouteBuilder $routes): void {
     $routes->connect('/documenten', ['controller' => 'Documenten', 'action' => 'index']);
 
     // Dossiers Routes
-    $routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'index']);
-    $routes->connect('/dossiers/{section}', ['controller' => 'Dossiers', 'action' => 'view'],['pass' => ['section'], 'section' => '[a-zA-Z0-9_-]+']);
-    $routes->connect('/dossiers/{section}/{subSection}', ['controller' => 'Dossiers', 'action' => 'view'],['pass' => ['section', 'subSection'], 'section' => '[a-zA-Z0-9_-]+', 'subSection' => '[a-zA-Z0-9_-]+']);
+    //$routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'index']);
+    //$routes->connect('/dossiers/{section}', ['controller' => 'Dossiers', 'action' => 'view'],['pass' => ['section'], 'section' => '[a-zA-Z0-9_-]+']);
+    //$routes->connect('/dossiers/{section}/{subSection}', ['controller' => 'Dossiers', 'action' => 'view'],['pass' => ['section', 'subSection'], 'section' => '[a-zA-Z0-9_-]+', 'subSection' => '[a-zA-Z0-9_-]+']);
     
 
     $routes->fallbacks(DashedRoute::class);

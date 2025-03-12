@@ -6,7 +6,7 @@
         </a>
     </li>
 
-    <!-- Clienten Dropdown -->
+<!-- 
     <?php
     $clientPages = ['Betrokkenen', 'Documenten', 'Formulieren', 'Rechtbank', 'Vermogen', 'Verslagen'];
     $isClientDropdownOpen = in_array($this->request->getParam('pass.1'), $clientPages);
@@ -34,7 +34,6 @@
         <?php } ?>
     </ul>
 
-    <!-- Andere Pages -->
     <?php
     $pages = ['Notities', 'Acties', 'Mentorschap', 'Adressen'];
     foreach ($pages as $page) {
@@ -46,7 +45,7 @@
     }
     ?>
 
-    <!-- Rekeningen Dropdown -->
+
     <?php
     $rekeningPages = ['Inkomsten', 'Uitgaven'];
     $isRekeningDropdownOpen = in_array($this->request->getParam('pass.1'), $rekeningPages);
@@ -73,7 +72,7 @@
         <?php } ?>
     </ul>
 
-    <!-- Schulden Dropdown -->
+
     <?php
     $schuldenPages = ['Schulden'];
     $isSchuldenDropdownOpen = in_array($this->request->getParam('pass.1'), $schuldenPages);
@@ -117,4 +116,4 @@ document.querySelectorAll('.dropdown-toggle').forEach(button => {
         this.querySelector('.arrow').innerHTML = menu.classList.contains('hidden') ? '&#9656;' : '&#9662;';
     });
 });
-</script>
+</script> -->
