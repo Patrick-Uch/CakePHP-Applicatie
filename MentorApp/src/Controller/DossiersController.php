@@ -74,6 +74,40 @@ class DossiersController extends AppController
         throw new NotFoundException(__('Pagina niet gevonden'));
     }
 
+    public function add()
+    {
+        $this->viewBuilder()->setLayout('dashboard'); // Gebruik de dashboard layout
+    
+        $dossier = $this->Dossiers->newEmptyEntity();
+        $bedrijven = $this->Dossiers->Bedrijven->find('list', ['limit' => 200])->all(); // Haal bedrijven op voor selectie
+    
+        if ($this->getRequest()->is('post')) {
+            $data = $this->getRequest()->getData();
+    
+            // Encrypt gevoelige gegevens voordat ze worden opgeslagen
+            if (!empty($data['bsn'])) {
+                $data['bsn'] = $this->encryptData($data['bsn']);
+            }
+            if (!empty($data['iban'])) {
+                $data['iban'] = $this->encryptData($data['iban']);
+            }
+    
+            $dossier = $this->Dossiers->patchEntity($dossier, $data);
+    
+            // Opslaan en feedback tonen
+            if ($this->Dossiers->save($dossier)) {
+                $this->Flash->success(__('Het dossier is succesvol aangemaakt.'));
+                return $this->redirect(['action' => 'index']);
+            }
+    
+            $this->Flash->error(__('Het dossier kon niet worden aangemaakt. Probeer het opnieuw.'));
+        }
+    
+        $this->set(compact('dossier', 'bedrijven')); // Verstuur data naar de view
+    }
+    
+
+
     /**
      * Bewerken van een dossier.
      */
