@@ -7,6 +7,11 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\EventInterface;
+use Cake\Datasource\EntityInterface;
+use Cake\ORM\TableRegistry;
+use Cake\Log\Log;
+
 
 /**
  * Dossiers Model
@@ -56,6 +61,7 @@ class DossiersTable extends Table
         ]);
         $this->hasMany('Logboek', [
             'foreignKey' => 'dossier_id',
+            'dependent' => false,
         ]);
         $this->hasMany('Taken', [
             'foreignKey' => 'dossier_id',
@@ -268,4 +274,111 @@ class DossiersTable extends Table
 
         return $rules;
     }
+
+    public function afterSave(EventInterface $event, EntityInterface $entity, $options)
+    {
+        $logTable = TableRegistry::getTableLocator()->get('Logboek');
+        $session = \Cake\Http\ServerRequestFactory::fromGlobals()->getSession();
+        $userId = $session->read('Auth.id');
+        
+        if (!$userId) {
+            Log::write('error', 'Cannot log dossier changes: No user found in session.');
+            return;
+        }
+    
+        // Log creation for a new dossier
+        if ($entity->isNew()) {
+            $logData = [
+                'dossier_id' => $entity->id, // Now entity id is available after save
+                'gebruiker_id' => $userId,
+                'actie' => 'Created',
+                'beschrijving' => 'Nieuw dossier aangemaakt: ' . $entity->naam,
+            ];
+    
+            Log::write('debug', 'Log data being saved: ' . json_encode($logData)); // Debugging line
+            
+            // Check if beschrijving is set correctly before saving
+            if (empty($logData['beschrijving'])) {
+                Log::write('error', 'beschrijving is empty!');
+            }
+    
+            // Create a new log entity
+            $logEntity = $logTable->newEntity($logData);
+            
+            // Save the log entry and check if it's saved correctly
+            if ($logTable->save($logEntity)) {
+                Log::write('debug', 'Log saved successfully');
+            } else {
+                Log::write('error', 'Failed to save log entry');
+            }
+        } else {
+            // For updated dossiers, log the changes
+            $changes = [];
+            foreach ($entity->getDirty() as $field) {
+                // Get the original and updated values
+                $original = $entity->getOriginal($field);
+                $current = $entity->get($field);
+                
+                if ($original !== $current) {
+                    $changes[] = ucfirst($field) . ': ' . (string)$original . ' → ' . (string)$current;
+                }
+            }
+    
+            // Log update if changes are found
+            if (!empty($changes)) {
+                $logData = [
+                    'dossier_id' => $entity->id,
+                    'gebruiker_id' => $userId,
+                    'actie' => 'Updated',
+                    'beschrijving' => 'Dossier gewijzigd: ' . implode('; ', $changes),
+                ];
+    
+                // Check if beschrijving is set correctly before saving
+                if (empty($logData['beschrijving'])) {
+                    Log::write('error', 'beschrijving is empty!');
+                }
+    
+                $logEntity = $logTable->newEntity($logData);
+    
+                // Save the log entry and check if it's saved correctly
+                if ($logTable->save($logEntity)) {
+                    Log::write('debug', 'Log saved successfully');
+                } else {
+                    Log::write('error', 'Failed to save log entry');
+                }
+            }
+        }
+    }
+    
+    public function beforeDelete(EventInterface $event, EntityInterface $entity, $options)
+{
+    $logTable = TableRegistry::getTableLocator()->get('Logboek');
+    $session = \Cake\Http\ServerRequestFactory::fromGlobals()->getSession();
+    $userId = $session->read('Auth.id');
+    
+    if (!$userId) {
+        Log::write('error', 'Cannot log dossier deletion: No user found in session.');
+        return;
+    }
+    
+    // Update log to indicate deletion instead of actually deleting it
+    $logData = [
+        'dossier_id' => $entity->id,
+        'gebruiker_id' => $userId,
+        'actie' => 'Deleted',
+        'beschrijving' => 'Dossier verwijderd: ' . $entity->naam,
+        'deleted' => true,  // Set the deleted flag
+    ];
+
+    $logEntity = $logTable->newEntity($logData);
+    
+    // Save the log entry with the 'deleted' flag set
+    if ($logTable->save($logEntity)) {
+        Log::write('debug', 'Log saved successfully for deletion');
+    } else {
+        Log::write('error', 'Failed to save log entry for deletion');
+    }
+}
+
+    
 }

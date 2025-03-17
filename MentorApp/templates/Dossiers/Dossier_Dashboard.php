@@ -1,5 +1,6 @@
-<div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<main class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
+    <script src="https://cdn.tailwindcss.com"></script>
         <h1 class="text-2xl font-semibold text-gray-900">Dossier Overzicht</h1>
     </div>
 
@@ -8,21 +9,20 @@
         <div class="p-6 flex flex-wrap gap-4 items-center">
             <div class="flex-1 min-w-[300px]">
                 <div class="relative">
-                    <input type="text" id="searchInput" placeholder="Zoek dossiers..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" id="searchInput" placeholder="Zoek dossiers..."
+                        class="w-96 max-w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 </div>
             </div>
             <div class="flex gap-4">
-                <!-- Status filter -->
-                <select id="statusFilter" class="border border-gray-300 rounded-lg py-2 pl-3 pr-8 focus:ring-blue-500 focus:border-blue-500">
+                <select id="statusFilter" class="w-40 max-w-full border border-gray-300 rounded-lg py-2 pl-3 pr-8 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Alle statussen</option>
                     <option value="Opstarten">Opstarten</option>
                     <option value="Actief">Actief</option>
                     <option value="In beëindiging">In beëindiging</option>
                     <option value="Afgesloten">Afgesloten</option>
                 </select>
-                <!-- Datum filter -->
-                <select id="dateFilter" class="border border-gray-300 rounded-lg py-2 pl-3 pr-8 focus:ring-blue-500 focus:border-blue-500">
+                <select id="dateFilter" class="w-40 max-w-full border border-gray-300 rounded-lg py-2 pl-3 pr-8 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Alle datums</option>
                     <option value="Vandaag">Vandaag</option>
                     <option value="Deze week">Deze week</option>
@@ -33,34 +33,34 @@
 
         <!-- Tabel met dossiers -->
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200" id="dossiersTable">
+            <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dossiernummer</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bedrijf</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Naam</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Laatst gewijzigd</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acties</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dossiernummer</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bedrijf</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Naam</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Laatst gewijzigd</th>
+                        <th class="border px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acties</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200" id="dossierRows">
+                <tbody class="bg-white divide-y divide-gray-200">
                     <?php foreach ($dossiers as $dossier): ?>
-                        <tr class="dossier-row" data-date="<?= $dossier->gemaakt_op->format('Y-m-d') ?>">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?= h($dossier->id) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->bedrijven->naam ?? 'Geen bedrijf gekoppeld') ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->naam) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                        <tr class="border dossier-row" data-date="<?= $dossier->gemaakt_op->format('Y-m-d') ?>">
+                            <td class="border px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->id) ?></td>
+                            <td class="border px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->bedrijven->naam ?? 'Geen bedrijf gekoppeld') ?></td>
+                            <td class="border px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->naam) ?></td>
+                            <td class="border px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                     <?= in_array($dossier->status, ['Opstarten', 'Actief']) ? 'bg-green-100 text-green-800' : 
                                     ($dossier->status == 'In beëindiging' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') ?>">
                                     <?= h($dossier->status) ?>
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->gemaakt_op->format('d-m-Y')) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->geupdate_op->timeAgoInWords()) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <td class="border px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->gemaakt_op->format('d-m-Y')) ?></td>
+                            <td class="border px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= h($dossier->geupdate_op->timeAgoInWords()) ?></td>
+                            <td class="border px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a href="<?= $this->Url->build(['controller' => 'Dossiers', 'action' => 'edit', $dossier->id]) ?>" class="text-blue-600 hover:text-blue-900 mr-3">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -76,6 +76,8 @@
             </table>
         </div>
     </div>
+</main>
+
     <script>
     // Filterfunctie voor de dossiertabel
     document.addEventListener("DOMContentLoaded", function () {

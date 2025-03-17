@@ -30,47 +30,58 @@ class DashboardController extends AppController
             return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
         }
 
+        // Het bedrijf_id van de ingelogde gebruiker
+        $bedrijfId = $user->bedrijf_id;
+
         // Correcte kolomnamen voor datumvelden
         $dateColumnHerinneringen = 'gemaakt_op';
         $dateColumnLogboek = 'geupdate_op'; // Gebruik 'geupdate_op' voor logboek volgorde
 
-        // Haal het aantal actieve dossiers op (status: Opstarten, Actief, In beëindiging)
+        // Haal het aantal actieve dossiers op (status: Opstarten, Actief, In beëindiging) voor het specifieke bedrijf
         $actieveDossiers = $this->Dossiers->find()
-            ->where(['status IN' => ['Opstarten', 'Actief', 'In beëindiging']])
+            ->where(['Dossiers.status IN' => ['Opstarten', 'Actief', 'In beëindiging']])
+            ->andWhere(['Dossiers.bedrijf_id' => $bedrijfId])
             ->count();
 
-        // Haal het aantal openstaande taken op (niet afgerond)
+        // Haal het aantal openstaande taken op (niet afgerond) voor het specifieke bedrijf
         $openTaken = $this->Taken->find()
-            ->where(['status !=' => 'Afgerond'])
+            ->matching('Dossiers', function($q) use ($bedrijfId) {
+                return $q->where(['Dossiers.bedrijf_id' => $bedrijfId]);
+            })
+            ->where(['Taken.status !=' => 'Afgerond'])
             ->count();
 
-        // Haal het aantal nieuwe herinneringen op (gemaakt op of na vandaag)
+        // Haal het aantal nieuwe herinneringen op (gemaakt op of na vandaag) voor het specifieke bedrijf
         $nieuweHerinneringen = $this->Herinneringen->find()
-            ->where([$dateColumnHerinneringen . ' >=' => date('Y-m-d')])
+            ->matching('Dossiers', function($q) use ($bedrijfId) {
+                return $q->where(['Dossiers.bedrijf_id' => $bedrijfId]);
+            })
+            ->where(['Herinneringen.' . $dateColumnHerinneringen . ' >=' => date('Y-m-d')]) // Specify table
             ->count();
 
-        // Haal de 5 laatst bijgewerkte dossiers op
+        // Haal de 5 laatst bijgewerkte dossiers op voor het specifieke bedrijf
         $recentDossiers = $this->Dossiers->find()
-            ->order(['geupdate_op' => 'DESC'])
+            ->order(['Dossiers.geupdate_op' => 'DESC'])
             ->limit(5)
+            ->andWhere(['Dossiers.bedrijf_id' => $bedrijfId])
             ->all();
 
-        // Haal de eerstvolgende herinneringen op, gesorteerd op datum
-        $herinneringen = $this->Herinneringen->find()
-            ->order([$dateColumnHerinneringen => 'ASC'])
-            ->limit(5)
-            ->all();
-
-        // Haal openstaande taken op, gesorteerd op deadline
+        // Haal openstaande taken op, gesorteerd op deadline voor het specifieke bedrijf
         $taken = $this->Taken->find()
-            ->where(['status !=' => 'Afgerond'])
-            ->order(['deadline' => 'ASC'])
+            ->matching('Dossiers', function($q) use ($bedrijfId) {
+                return $q->where(['Dossiers.bedrijf_id' => $bedrijfId]);
+            })
+            ->where(['Taken.status !=' => 'Afgerond'])
+            ->order(['Taken.deadline' => 'ASC'])
             ->limit(5)
             ->all();
 
-        // Haal de laatste 5 logboekvermeldingen op, gesorteerd op bijgewerkte datum
+        // Haal de laatste 5 logboekvermeldingen op voor het specifieke bedrijf
         $logboek = $this->Logboek->find()
-            ->order([$dateColumnLogboek => 'DESC'])
+            ->matching('Dossiers', function($q) use ($bedrijfId) {
+                return $q->where(['Dossiers.bedrijf_id' => $bedrijfId]);
+            })
+            ->order(['Logboek.' . $dateColumnLogboek => 'DESC'])
             ->limit(5)
             ->all();
 
@@ -84,7 +95,6 @@ class DashboardController extends AppController
             'openTaken',
             'nieuweHerinneringen',
             'recentDossiers',
-            'herinneringen',
             'taken',
             'logboek'
         ));

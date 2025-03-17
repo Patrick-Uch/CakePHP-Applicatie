@@ -2,7 +2,7 @@
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Dossier $dossier
- * @var string[]|\Cake\Collection\CollectionInterface $bedrijven
+ * @var \App\Model\Entity\Bedrijf $bedrijf
  */
 ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -15,15 +15,15 @@
     <div class="bg-white shadow-lg rounded-lg p-6">
         <?= $this->Form->create($dossier, ['class' => 'space-y-6']) ?>
 
-        <!-- Bedrijf & Status (Bedrijf is disabled) -->
+        <!-- Bedrijf & Status -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-gray-50 p-4 rounded-lg">
-                <?= $this->Form->control('bedrijf_id', [
-                    'options' => $bedrijven,
-                    'disabled' => true, // Bedrijf kan niet worden gewijzigd
-                    'class' => 'w-full p-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed',
-                    'label' => ['text' => __('Bedrijf'), 'class' => 'block text-sm font-medium text-gray-700']
-                ]) ?>
+                <label class="block text-sm font-medium text-gray-700">Bedrijf</label>
+                <input type="text" value="<?= h($bedrijf->naam) ?>"
+                       class="w-full p-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed" disabled>
+
+                <!-- Verberg het bedrijf_id veld zodat het correct wordt opgeslagen -->
+                <?= $this->Form->hidden('bedrijf_id', ['value' => $bedrijf->id]) ?>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg">

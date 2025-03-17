@@ -77,6 +77,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             'resolver' => [
                 'className' => 'Authentication.Orm',
                 'userModel' => 'Gebruikers', 
+                'finder' => 'auth',
             ],
         ]);
     

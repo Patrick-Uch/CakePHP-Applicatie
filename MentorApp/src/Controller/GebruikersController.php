@@ -36,7 +36,7 @@ class GebruikersController extends AppController
             // Probeer de gebruiker op te slaan
             if ($this->Gebruikers->save($gebruiker)) {
                 $this->Flash->success('Je bent succesvol geregistreerd.');
-                return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
+                return $this->redirect(['action' => 'login']);
             }
 
             $this->Flash->error('Registratie mislukt. Probeer opnieuw.');
@@ -47,23 +47,31 @@ class GebruikersController extends AppController
 
     public function login()
     {
-        $result = $this->Authentication->getResult(); // Haal het authenticatieresultaat op
-    
+        $result = $this->Authentication->getResult(); // Get authentication result
+        
         if ($this->request->is('post')) {
-            $inputPassword = $this->request->getData('wachtwoord'); // Haal het ingevoerde wachtwoord op
+            $inputPassword = $this->request->getData('wachtwoord'); // Get entered password
             $user = $this->fetchTable('Gebruikers')
                 ->find()
                 ->where(['email' => $this->request->getData('email')])
                 ->first();
-    
-            // Controleer of de authenticatie geldig is
+            
+            // Check if the authentication is valid
             if ($result->isValid()) {
+                // If the user is valid, set the identity in the session
+                $this->Authentication->setIdentity($user);
+    
+                // Redirect to the dashboard after successful login
                 return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
             }
     
+            // Flash error if login fails
             $this->Flash->error('Ongeldige e-mail of wachtwoord.');
         }
     }
+    
+    
+    
     
     public function logout()
     {

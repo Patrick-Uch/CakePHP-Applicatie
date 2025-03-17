@@ -15,27 +15,28 @@ class GebruikersTable extends Table
     {
         parent::initialize($config);
 
-        // Naam database tabel
         $this->setTable('gebruikers');
-
-        // Primaire key
         $this->setPrimaryKey('id');
 
-        // Relatie: Elke gebruiker behoort tot één bedrijf
+        // Relatie met Bedrijven, zorg ervoor dat bedrijf_id altijd wordt geladen
         $this->belongsTo('Bedrijven', [
             'foreignKey' => 'bedrijf_id',
-            'joinType' => 'LEFT', // LEFT JOIN zodat een gebruiker geen bedrijf kan hebben
+            'joinType' => 'INNER', // Verander van LEFT naar INNER als gebruikers altijd een bedrijf moeten hebben
         ]);
 
-        // Timestamp-behavior toevoegen (voegt automatisch created & modified velden toe)
         $this->addBehavior('Timestamp');
     }
 
-    // Voor het opslaan: controleer of het wachtwoord gewijzigd is en hash het zo nodig
+    // Custom finder voor authenticatie
+    public function findAuth(\Cake\ORM\Query $query, array $options)
+    {
+        return $query->select(['id', 'bedrijf_id', 'naam', 'email', 'wachtwoord'])
+                     ->contain(['Bedrijven']); // Zorg ervoor dat bedrijf_id altijd beschikbaar is
+    }
+
     public function beforeSave(EventInterface $event, $entity, ArrayObject $options)
     {
         if ($entity->isDirty('wachtwoord')) { 
-            // Controleer of het wachtwoord al gehasht is
             if (!password_get_info((string)$entity->wachtwoord)['algo']) {
                 $entity->wachtwoord = (new DefaultPasswordHasher())->hash($entity->wachtwoord);
             }

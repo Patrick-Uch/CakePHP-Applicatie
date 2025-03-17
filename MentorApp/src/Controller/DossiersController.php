@@ -1,124 +1,116 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Controller\Controller;
+use Cake\Event\EventInterface;
 use Cake\Utility\Security;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
+use Cake\Log\Log;
+use Cake\Http\Exception\ForbiddenException;
 
 class DossiersController extends AppController
 {
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        // Laad de Authentication component
+        $this->loadComponent('Authentication.Authentication');
+
+        // Sta niet-geauthenticeerde gebruikers toe om login en register te bekijken
+        $this->Authentication->addUnauthenticatedActions(['login', 'register']);
+    }
+
     public function index()
     {
-        $this->viewBuilder()->setLayout('dashboard'); // gebruik dashboard layout
-    
-        $dossiersTable = $this->fetchTable('Dossiers'); // Haal de Dossiers tabel op
-    
+        // Haal de ingelogde gebruiker op
+        $gebruiker = $this->Authentication->getIdentity();
+
+        if (!$gebruiker) {
+            return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
+        }
+
+        // Gebruik de dashboard layout voor weergave
+        $this->viewBuilder()->setLayout('dashboard'); 
+
+        // Haal dossiers op die bij het bedrijf van de gebruiker horen
+        $dossiersTable = $this->fetchTable('Dossiers');
         $query = $dossiersTable->find()
-            ->contain(['Bedrijven']); // Voeg Bedrijven toe
-    
-    
-        $dossiers = $this->paginate($query); // Voeg paginering toe
+            ->where(['bedrijf_id' => $gebruiker->bedrijf_id]) // Toon alleen dossiers voor het bedrijf van de gebruiker
+            ->contain(['Bedrijven']);
+
+        $dossiers = $this->paginate($query); // Paginatie voor de dossiers
         $this->set(compact('dossiers'));
-    
-        return $this->render('/Dossiers/dossier_dashboard'); // Toon de dossier dashboardpagina
-    }
-    
-    public function view(?string $section = null, ?string $subSection = null, ?int $id = null)
-    {
-        $this->viewBuilder()->setLayout('dashboard'); // Gebruik dashboard layout
-    
-        // Als er geen sectie is opgegeven, toon het algemene dossier overzicht
-        if (!$section) {
-            $query = $this->Dossiers->find()->contain(['Bedrijven']);
-            $dossiers = $this->paginate($query);
-            $this->set(compact('dossiers'));
-    
-            return $this->render('/Dossiers/Dossier_Dashboard');
-        }
-    
-        $section = ucfirst(strtolower($section)); // Zet de sectie om naar hoofdletters
-        $subSection = $subSection ? ucfirst(strtolower($subSection)) : null; 
-    
-        // Geldige secties en hun bijbehorende subsecties
-        $validSections = [
-            'Clienten' => ['Betrokkenen', 'Client', 'Documenten', 'Formulieren', 'Rechtbank', 'Vermogen', 'Verslagen'],
-            'Rekeningen' => ['Inkomsten', 'Uitgaven'],
-            'Schulden' => ['Schulden'],
-        ];
-        $standaloneSections = ['Acties', 'Adressen', 'Mentorschap', 'Notities']; // Secties zonder subsecties
-    
-        // Haal het dossier op als er een ID is
-        if ($id) {
-            $dossier = $this->Dossiers->get($id, ['contain' => ['Bedrijven']]);
-            $this->set(compact('dossier'));
-        }
-    
-        // Controleer of het een zelfstandige sectie is en toon deze direct
-        if (in_array($section, $standaloneSections)) {
-            return $this->render("/Dossiers/$section");
-        }
-    
-        // Als er een sectie is zonder subsectie, ga automatisch naar de eerste subpagina
-        if (isset($validSections[$section]) && !$subSection) {
-            $firstSubPage = $validSections[$section][0];
-            return $this->redirect(["controller" => "Dossiers", "action" => "view", $section, $firstSubPage, $id]);
-        }
-    
-        // Controleer of de sectie en subsectie geldig zijn en toon deze
-        if (isset($validSections[$section]) && in_array($subSection, $validSections[$section])) {
-            return $this->render("/Dossiers/$section/$subSection");
-        }
-    
-        // Toon een foutmelding als de pagina niet bestaat
-        throw new NotFoundException(__('Pagina niet gevonden'));
+
+        return $this->render('/Dossiers/dossier_dashboard'); // Render het view voor dossier dashboard
     }
 
     public function add()
     {
-        $this->viewBuilder()->setLayout('dashboard'); // Gebruik de dashboard layout
-    
+        // Gebruik de dashboard layout voor weergave
+        $this->viewBuilder()->setLayout('dashboard');
+
+        // Haal de ingelogde gebruiker op
+        $gebruiker = $this->Authentication->getIdentity();
+        if (!$gebruiker || empty($gebruiker->bedrijf_id)) {
+            $this->Flash->error(__('Je hebt geen gekoppeld bedrijf. Neem contact op met de beheerder.'));
+            return $this->redirect(['controller' => 'Gebruikers', 'action' => 'index']);
+        }
+
+        // Verkrijg het bedrijf_id van de ingelogde gebruiker
+        $bedrijf_id = $gebruiker->bedrijf_id;
+
         $dossier = $this->Dossiers->newEmptyEntity();
-        $bedrijven = $this->Dossiers->Bedrijven->find('list', ['limit' => 200])->all(); // Haal bedrijven op voor selectie
-    
         if ($this->getRequest()->is('post')) {
             $data = $this->getRequest()->getData();
-    
-            // Encrypt gevoelige gegevens voordat ze worden opgeslagen
+            $data['bedrijf_id'] = $bedrijf_id; // Koppel het dossier aan het bedrijf van de gebruiker
+
+            // Encryptie van gevoelige gegevens
             if (!empty($data['bsn'])) {
                 $data['bsn'] = $this->encryptData($data['bsn']);
             }
             if (!empty($data['iban'])) {
                 $data['iban'] = $this->encryptData($data['iban']);
             }
-    
+
             $dossier = $this->Dossiers->patchEntity($dossier, $data);
-    
-            // Opslaan en feedback tonen
+
+            // Probeer het dossier op te slaan
             if ($this->Dossiers->save($dossier)) {
                 $this->Flash->success(__('Het dossier is succesvol aangemaakt.'));
                 return $this->redirect(['action' => 'index']);
             }
-    
+
             $this->Flash->error(__('Het dossier kon niet worden aangemaakt. Probeer het opnieuw.'));
         }
-    
-        $this->set(compact('dossier', 'bedrijven')); // Verstuur data naar de view
+
+        // Haal het bedrijf op voor weergave in het formulier
+        $bedrijf = $this->Dossiers->Bedrijven->find()
+            ->where(['id' => $bedrijf_id])
+            ->firstOrFail();
+
+        $this->set(compact('dossier', 'bedrijf', 'gebruiker'));
     }
-    
 
-
-    /**
-     * Bewerken van een dossier.
-     */
     public function edit($id = null)
     {
-        $this->viewBuilder()->setLayout('dashboard'); // Gebruik dashboard layout
-
-        $dossier = $this->Dossiers->get($id, ['contain' => ['Bedrijven']]);
-        $bedrijven = $this->Dossiers->Bedrijven->find('list', ['limit' => 200])->all();
+        // Gebruik de dashboard layout voor weergave
+        $this->viewBuilder()->setLayout('dashboard');
     
-        // Decrypt de velden voordat ze worden weergegeven in het formulier
+        // Haal het dossier op met gekoppelde bedrijven
+        $dossier = $this->Dossiers->get($id, ['contain' => ['Bedrijven']]);
+        
+        // Haal bedrijven op voor de dropdownlijst (we hebben enkel een lijst nodig)
+        $bedrijven = $this->Dossiers->Bedrijven->find('list', ['limit' => 200])->all();
+        
+        // Haal de ingelogde gebruiker op (indien nodig voor de weergave)
+        $gebruiker = $this->Authentication->getIdentity();
+    
+        // Decryptie van gegevens voordat ze getoond worden in het formulier
         if (!empty($dossier->bsn)) {
             $dossier->bsn = $this->decryptData($dossier->bsn);
         }
@@ -126,10 +118,11 @@ class DossiersController extends AppController
             $dossier->iban = $this->decryptData($dossier->iban);
         }
     
+        // Handle formulierinzending (POST, PUT, PATCH)
         if ($this->getRequest()->is(['post', 'put', 'patch'])) {
             $data = $this->getRequest()->getData();
-    
-            // Encrypt de gevoelige velden voordat ze worden opgeslagen
+            
+            // Encryptie van gevoelige gegevens voordat ze opgeslagen worden
             if (!empty($data['bsn'])) {
                 $data['bsn'] = $this->encryptData($data['bsn']);
             }
@@ -137,13 +130,14 @@ class DossiersController extends AppController
                 $data['iban'] = $this->encryptData($data['iban']);
             }
     
+            // Patch de data naar het dossier object
             $dossier = $this->Dossiers->patchEntity($dossier, $data);
     
-            // Zorg ervoor dat CakePHP de velden als gewijzigd herkent
+            // Markeer de velden als gewijzigd
             $dossier->setDirty('bsn', true);
             $dossier->setDirty('iban', true);
     
-            // Opslaan in de database
+            // Probeer het dossier op te slaan
             if ($this->Dossiers->save($dossier)) {
                 $this->Flash->success('Dossier is succesvol bijgewerkt.');
                 return $this->redirect(['action' => 'index']);
@@ -152,8 +146,60 @@ class DossiersController extends AppController
             }
         }
     
-        $this->set(compact('dossier', 'bedrijven'));
+        // Stel de variabelen in voor de weergave
+        $this->set(compact('dossier', 'bedrijven', 'gebruiker'));
     }
+    
+    public function delete($id = null)
+    {
+        // Haal het dossier op via ID
+        $dossier = $this->Dossiers->get($id);
+    
+        // Controleer of het dossier bestaat
+        if (!$dossier) {
+            $this->Flash->error(__('Dossier niet gevonden.'));
+            return $this->redirect(['action' => 'index']);
+        }
+    
+        // Zorg ervoor dat de gebruiker geautoriseerd is om dit dossier te verwijderen
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $dossier->bedrijf_id !== $user->bedrijf_id) {
+            throw new ForbiddenException('Je hebt geen toestemming om dit dossier te verwijderen.');
+        }
+    
+        // Begin een transactie om dataconsistentie te waarborgen
+        $this->Dossiers->getConnection()->begin();
+    
+        try {
+            // Log het verwijderen van het dossier **voordat** het dossier daadwerkelijk wordt verwijderd
+            $logTable = TableRegistry::getTableLocator()->get('Logboek');
+            $logData = [
+                'dossier_id' => $dossier->id,
+                'gebruiker_id' => $user->id,
+                'actie' => 'Verwijderd',
+                'beschrijving' => 'Dossier verwijderd: ' . $dossier->naam,
+            ];
+            $logEntity = $logTable->newEntity($logData);
+            $logTable->save($logEntity); // Log entry creation
+    
+            // Probeer het dossier te verwijderen
+            if ($this->Dossiers->delete($dossier)) {
+                $this->Flash->success(__('Dossier succesvol verwijderd.'));
+                // Commit de transactie
+                $this->Dossiers->getConnection()->commit();
+            } else {
+                throw new \Exception('Het verwijderen van het dossier is mislukt.');
+            }
+        } catch (\Exception $e) {
+            // Rollback als er een fout optreedt
+            $this->Dossiers->getConnection()->rollback();
+            $this->Flash->error(__('Er is een fout opgetreden bij het verwijderen van het dossier. Probeer het opnieuw.'));
+        }
+    
+        // Redirect naar de index of een andere geschikte pagina
+        return $this->redirect(['action' => 'index']);
+    }
+    
 
     private function encryptData($value)
     {
@@ -161,8 +207,8 @@ class DossiersController extends AppController
             return null; // Niet encrypten als er geen waarde is
         }
 
-        $key = Security::getSalt(); // Gebruik CakePHP's security key
-        $iv = substr($key, 0, 16); // IV moet precies 16 bytes zijn
+        $key = Security::getSalt(); // Gebruik de beveiligingssleutel van CakePHP
+        $iv = substr($key, 0, 16); // IV moet exact 16 bytes zijn
 
         return base64_encode(openssl_encrypt($value, 'AES-256-CBC', $key, 0, $iv));
     }
