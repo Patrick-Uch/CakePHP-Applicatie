@@ -33,6 +33,7 @@ class Logboek extends Entity
         'dossier_id' => true,
         'gebruiker_id' => true,
         'actie' => true,
+        'beschrijving' => true,
         'gemaakt_op' => true,
         'geupdate_op' => true,
         'dossier' => true,

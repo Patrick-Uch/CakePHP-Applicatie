@@ -74,6 +74,23 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <div class="flex items-center justify-between mt-4 px-6">
+                <div class="text-sm text-gray-700">
+                    Weergave van <span class="font-medium"><?= $this->Paginator->counter('{{start}}') ?></span> 
+                    tot <span class="font-medium"><?= $this->Paginator->counter('{{end}}') ?></span> 
+                    van <span class="font-medium"><?= $this->Paginator->counter('{{count}}') ?></span> resultaten
+                </div>
+                <div class="flex space-x-2">
+                    <?= $this->Paginator->prev('← Vorige', [
+                        'class' => 'px-4 py-2 rounded-lg border border-gray-300 text-gray-600 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed',
+                        'disabled' => !$this->Paginator->hasPrev()
+                    ]) ?>
+                    <?= $this->Paginator->next('Volgende →', [
+                        'class' => 'px-4 py-2 rounded-lg border border-gray-300 text-gray-600 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed',
+                        'disabled' => !$this->Paginator->hasNext()
+                    ]) ?>
+                </div>
+            </div>
         </div>
     </div>
 </main>

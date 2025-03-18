@@ -50,6 +50,13 @@
                     <img src="<?= $this->Url->image('icons/document.png') ?>" class="w-12 h-12" alt="Documenten">
                     <span>Documenten</span>
                 </a>
+
+                <!-- Logboek -->
+                <a href="<?= $this->Url->build(['controller' => 'Logboek', 'action' => 'index']) ?>" 
+                   class="navbar-link <?= ($this->request->getParam('controller') === 'Logboek') ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600' ?>">
+                    <img src="<?= $this->Url->image('icons/Logboek.png') ?>" class="w-12 h-12" alt="Logboek">
+                    <span>Logboek</span>
+                </a>
             </div>
 
             <!-- Profiel dropdownmenu -->

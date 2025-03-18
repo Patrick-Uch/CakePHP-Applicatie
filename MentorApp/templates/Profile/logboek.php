@@ -47,11 +47,13 @@
 
                 <div class="flex items-center justify-between mt-4">
                     <div class="text-sm text-gray-700">
-                        Weergave van <span class="font-medium"><?= count($logboek) ? 1 : 0 ?></span> tot <span class="font-medium"><?= count($logboek) ?></span> van <span class="font-medium"><?= count($logboek) ?></span> resultaten
+                        Weergave van <span class="font-medium"><?= $this->Paginator->counter('{{start}}') ?></span> 
+                        tot <span class="font-medium"><?= $this->Paginator->counter('{{end}}') ?></span> 
+                        van <span class="font-medium"><?= $this->Paginator->counter('{{count}}') ?></span> resultaten
                     </div>
-                    <div class="flex gap-2">
-                        <?= $this->Paginator->prev('Vorige', ['class' => 'border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 disabled:opacity-50']) ?>
-                        <?= $this->Paginator->next('Volgende', ['class' => 'border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100']) ?>
+                    <div class="flex space-x-2">
+                        <?= $this->Paginator->prev('← Vorige') ?>
+                        <?= $this->Paginator->next('Volgende →') ?>
                     </div>
                 </div>
             </div>

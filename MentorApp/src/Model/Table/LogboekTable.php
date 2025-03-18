@@ -3,19 +3,12 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
-use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 class LogboekTable extends Table
 {
-    /**
-     * Initialize method
-     *
-     * @param array<string, mixed> $config The configuration for the Table.
-     * @return void
-     */
     public function initialize(array $config): void
     {
         parent::initialize($config);
@@ -32,14 +25,10 @@ class LogboekTable extends Table
             'foreignKey' => 'gebruiker_id',
             'joinType' => 'INNER',
         ]);
+
+        $this->addBehavior('Timestamp');
     }
 
-    /**
-     * Default validation rules.
-     *
-     * @param \Cake\Validation\Validator $validator Validator instance.
-     * @return \Cake\Validation\Validator
-     */
     public function validationDefault(Validator $validator): Validator
     {
         $validator
@@ -53,24 +42,14 @@ class LogboekTable extends Table
             ->requirePresence('actie', 'create')
             ->notEmptyString('actie');
 
-        $validator
-            ->dateTime('gemaakt_op')
-            ->notEmptyDateTime('gemaakt_op');
-
-        $validator
-            ->dateTime('geupdate_op')
-            ->notEmptyDateTime('geupdate_op');
-
+            $validator
+            ->scalar('beschrijving')
+            ->requirePresence('beschrijving', 'create')
+            ->notEmptyString('beschrijving');
+        
         return $validator;
     }
 
-    /**
-     * Returns a rules checker object that will be used for validating
-     * application integrity.
-     *
-     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
-     * @return \Cake\ORM\RulesChecker
-     */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['dossier_id'], 'Dossiers'), ['errorField' => 'dossier_id']);

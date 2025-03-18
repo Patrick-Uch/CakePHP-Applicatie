@@ -115,25 +115,27 @@ class ProfileController extends AppController
 
     public function logboek()
     {
-        $this->viewBuilder()->setLayout('dashboard'); // Gebruik het 'dashboard' layout 
+        $this->viewBuilder()->setLayout('dashboard');
     
-        // Get the logged-in user
+        // Check of de gebruiker is ingelogd
         $user = $this->request->getAttribute('identity');
-    
         if (!$user) {
             $this->Flash->error('Je moet ingelogd zijn om het logboek te bekijken.');
             return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
         }
     
-        // Fetch only logs for the logged-in user
+        // Haal de logs op voor de ingelogde user
         $logboekTable = TableRegistry::getTableLocator()->get('Logboek');
         $query = $logboekTable->find()
-            ->contain(['Dossiers', 'Gebruikers'])
+            ->leftJoinWith('Dossiers') 
+            ->contain(['Gebruikers']) 
             ->where(['Logboek.gebruiker_id' => $user->id])
-            ->order(['Logboek.gemaakt_op' => 'DESC']); // ✅ Specify Logboek.gemaakt_op
+            ->order(['Logboek.gemaakt_op' => 'DESC']);
     
         $logboek = $this->paginate($query);
         $this->set(compact('logboek'));
     }
+    
+    
     
 }

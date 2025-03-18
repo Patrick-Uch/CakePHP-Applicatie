@@ -4,60 +4,12 @@ declare(strict_types=1);
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use Cake\Utility\Security;
 
-/**
- * Dossier Entity
- *
- * @property int $id
- * @property int $bedrijf_id
- * @property string $status
- * @property string $naam
- * @property string $email_1
- * @property string|null $email_2
- * @property string $telefoonnummer_1
- * @property string|null $telefoonnummer_2
- * @property string $bsn
- * @property string $iban
- * @property string $postadres_straat
- * @property string $postadres_huisnummer
- * @property string $postadres_toevoeging
- * @property string $postadres_gemeente
- * @property string $postadres_provincie
- * @property string $bezoekadres_straat
- * @property string $bezoekadres_huisnummer
- * @property string $bezoekadres_toevoeging
- * @property string $bezoekadres_postcode
- * @property string $bezoekadres_gemeente
- * @property string $bezoekadres_provincie
- * @property string $rechtbank
- * @property string $mb_cb_nummer
- * @property string|null $betrokkenen_relatie
- * @property string|null $betrokkenen_voor_achternaam
- * @property string|null $betrokkenen_telefoonnummer
- * @property string|null $betrokkenen_email
- * @property string|null $betrokkenen_straat
- * @property string|null $betrokkenen_huisnummer
- * @property string|null $betrokkenen_toevoeging
- * @property string|null $betrokkenen_postcode
- * @property string|null $betrokkenen_gemeente
- * @property string|null $encryption_key_id
- * @property \Cake\I18n\DateTime $gemaakt_op
- * @property \Cake\I18n\DateTime $geupdate_op
- *
- * @property \App\Model\Entity\Bedrijven $bedrijven
- * @property \App\Model\Entity\Dagboek[] $dagboek
- */
 class Dossier extends Entity
 {
-    /**
-     * Fields that can be mass assigned using newEntity() or patchEntity().
-     *
-     * Note that when '*' is set to true, this allows all unspecified fields to
-     * be mass assigned. For security purposes, it is advised to set '*' to false
-     * (or remove it), and explicitly make individual fields accessible as needed.
-     *
-     * @var array<string, bool>
-     */
+    protected array $_hidden = ['encryption_key_id']; 
+
     protected array $_accessible = [
         'bedrijf_id' => true,
         'status' => true,
@@ -93,7 +45,84 @@ class Dossier extends Entity
         'encryption_key_id' => true,
         'gemaakt_op' => true,
         'geupdate_op' => true,
-        'bedrijven' => true,
-        'dagboek' => true,
     ];
+
+    /**
+     * Haalt de encryptiesleutel op
+     */
+    private function getEncryptionKey(): string
+    {
+        return hash('sha256', Security::getSalt(), true);
+    }
+
+    /**
+     * Haalt een vaste IV op (niet veilig voor productiesystemen)
+     */
+    private function getEncryptionIV(): string
+    {
+        return substr(Security::getSalt(), 0, 16);
+    }
+
+    /**
+     * Versleutelt een waarde met AES-256-CBC
+     */
+    private function encrypt(?string $waarde): ?string
+    {
+        if (empty($waarde)) {
+            return null;
+        }
+
+        $sleutel = $this->getEncryptionKey();
+        $iv = $this->getEncryptionIV();
+
+        return base64_encode(openssl_encrypt($waarde, 'AES-256-CBC', $sleutel, 0, $iv));
+    }
+
+    /**
+     * Ontsleutelt een waarde met AES-256-CBC
+     */
+    private function decrypt(?string $waarde): ?string
+    {
+        if (empty($waarde)) {
+            return null;
+        }
+
+        $sleutel = $this->getEncryptionKey();
+        $iv = $this->getEncryptionIV();
+
+        $ontsleuteld = openssl_decrypt(base64_decode($waarde), 'AES-256-CBC', $sleutel, 0, $iv);
+        return $ontsleuteld ?: null;
+    }
+
+    /**
+     * Getter voor BSN (ontsleutelt voor weergave)
+     */
+    protected function _getBsn(): ?string
+    {
+        return $this->decrypt($this->_fields['bsn'] ?? null);
+    }
+
+    /**
+     * Setter voor BSN (versleutelt voor opslag)
+     */
+    protected function _setBsn(?string $bsn): ?string
+    {
+        return $this->encrypt($bsn);
+    }
+
+    /**
+     * Getter voor IBAN (ontsleutelt voor weergave)
+     */
+    protected function _getIban(): ?string
+    {
+        return $this->decrypt($this->_fields['iban'] ?? null);
+    }
+
+    /**
+     * Setter voor IBAN (versleutelt voor opslag)
+     */
+    protected function _setIban(?string $iban): ?string
+    {
+        return $this->encrypt($iban);
+    }
 }
