@@ -1,50 +1,62 @@
-<?php
-/**
- * @var \App\View\AppView $this
- * @var iterable<\App\Model\Entity\Logboek> $logboek
- */
-?>
-<div class="logboek index content">
-    <?= $this->Html->link(__('New Logboek'), ['action' => 'add'], ['class' => 'button float-right']) ?>
-    <h3><?= __('Logboek') ?></h3>
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
-                    <th><?= $this->Paginator->sort('dossier_id') ?></th>
-                    <th><?= $this->Paginator->sort('gebruiker_id') ?></th>
-                    <th><?= $this->Paginator->sort('gemaakt_op') ?></th>
-                    <th><?= $this->Paginator->sort('geupdate_op') ?></th>
-                    <th class="actions"><?= __('Actions') ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($logboek as $logboek): ?>
-                <tr>
-                    <td><?= $this->Number->format($logboek->id) ?></td>
-                    <td><?= $logboek->hasValue('dossier') ? $this->Html->link($logboek->dossier->status, ['controller' => 'Dossiers', 'action' => 'view', $logboek->dossier->id]) : '' ?></td>
-                    <td><?= $logboek->hasValue('gebruiker') ? $this->Html->link($logboek->gebruiker->naam, ['controller' => 'Gebruikers', 'action' => 'view', $logboek->gebruiker->id]) : '' ?></td>
-                    <td><?= h($logboek->gemaakt_op) ?></td>
-                    <td><?= h($logboek->geupdate_op) ?></td>
-                    <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $logboek->id]) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $logboek->id]) ?>
-                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $logboek->id], ['confirm' => __('Are you sure you want to delete # {0}?', $logboek->id)]) ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12">
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-200 rounded-lg shadow-md">
+                    <thead class="bg-gray-100">
+                        <tr class="text-gray-600 text-sm uppercase">
+                        <th class="px-6 py-3 text-left font-semibold">Tijdstip</th>
+                        <th class="px-6 py-3 text-left font-semibold">Dossier</th>
+                        <th class="px-6 py-3 text-left font-semibold">Gebruiker</th>
+                        <th class="px-6 py-3 text-left font-semibold">Actie</th>
+                        <th class="px-6 py-3 text-left font-semibold">Beschrijving</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <?php if (!empty($logboek)) : ?>
+                        <?php foreach ($logboek as $log): ?>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm text-gray-700"><?= h($log->gemaakt_op) ?></td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    <?= isset($log->dossier_id) ? h($log->dossier_id) : '<span class="text-gray-400 italic">Onbekend</span>' ?>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    <?= isset($log->gebruiker->naam) ? h($log->gebruiker->naam) : '<span class="text-gray-400 italic">Onbekend</span>' ?>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold 
+                                        <?= $log->actie === 'Created' ? 'bg-blue-100 text-blue-800' : 
+                                            ($log->actie === 'Updated' ? 'bg-yellow-100 text-yellow-800' : 
+                                            ($log->actie === 'Deleted' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) ?>">
+                                        <?= h($log->actie) ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600"><?= h($log->beschrijving) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php else : ?>
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500 italic">Geen logs gevonden</td>
+                        </tr>
+                        <?php endif; ?>
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between mt-4">
+                    <div class="text-sm text-gray-700">
+                        Weergave van <span class="font-medium"><?= $this->Paginator->counter('{{start}}') ?></span> 
+                        tot <span class="font-medium"><?= $this->Paginator->counter('{{end}}') ?></span> 
+                        van <span class="font-medium"><?= $this->Paginator->counter('{{count}}') ?></span> resultaten
+                    </div>
+                    <div class="flex space-x-2">
+                        <?= $this->Paginator->prev('← Vorige') ?>
+                        <?= $this->Paginator->next('Volgende →') ?>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="paginator">
-        <ul class="pagination">
-            <?= $this->Paginator->first('<< ' . __('first')) ?>
-            <?= $this->Paginator->prev('< ' . __('previous')) ?>
-            <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next(__('next') . ' >') ?>
-            <?= $this->Paginator->last(__('last') . ' >>') ?>
-        </ul>
-        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
-    </div>
-</div>
+</main>

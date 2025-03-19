@@ -47,82 +47,62 @@ class Dossier extends Entity
         'geupdate_op' => true,
     ];
 
-    /**
-     * Haalt de encryptiesleutel op
-     */
-    private function getEncryptionKey(): string
-    {
-        return hash('sha256', Security::getSalt(), true);
-    }
 
-    /**
-     * Haalt een vaste IV op (niet veilig voor productiesystemen)
-     */
-    private function getEncryptionIV(): string
-    {
-        return substr(Security::getSalt(), 0, 16);
-    }
+//     private function getEncryptionKey(): string
+//     {
+//         return hash('sha256', Security::getSalt(), true);
+//     }
 
-    /**
-     * Versleutelt een waarde met AES-256-CBC
-     */
-    private function encrypt(?string $waarde): ?string
-    {
-        if (empty($waarde)) {
-            return null;
-        }
 
-        $sleutel = $this->getEncryptionKey();
-        $iv = $this->getEncryptionIV();
+//     private function getEncryptionIV(): string
+//     {
+//         return substr(Security::getSalt(), 0, 16);
+//     }
 
-        return base64_encode(openssl_encrypt($waarde, 'AES-256-CBC', $sleutel, 0, $iv));
-    }
+//     private function encrypt(?string $waarde): ?string
+//     {
+//         if (empty($waarde)) {
+//             return null;
+//         }
 
-    /**
-     * Ontsleutelt een waarde met AES-256-CBC
-     */
-    private function decrypt(?string $waarde): ?string
-    {
-        if (empty($waarde)) {
-            return null;
-        }
+//         $sleutel = $this->getEncryptionKey();
+//         $iv = $this->getEncryptionIV();
 
-        $sleutel = $this->getEncryptionKey();
-        $iv = $this->getEncryptionIV();
+//         return base64_encode(openssl_encrypt($waarde, 'AES-256-CBC', $sleutel, 0, $iv));
+//     }
 
-        $ontsleuteld = openssl_decrypt(base64_decode($waarde), 'AES-256-CBC', $sleutel, 0, $iv);
-        return $ontsleuteld ?: null;
-    }
+//     private function decrypt(?string $waarde): ?string
+//     {
+//         if (empty($waarde)) {
+//             return null;
+//         }
 
-    /**
-     * Getter voor BSN (ontsleutelt voor weergave)
-     */
-    protected function _getBsn(): ?string
-    {
-        return $this->decrypt($this->_fields['bsn'] ?? null);
-    }
+//         $sleutel = $this->getEncryptionKey();
+//         $iv = $this->getEncryptionIV();
 
-    /**
-     * Setter voor BSN (versleutelt voor opslag)
-     */
-    protected function _setBsn(?string $bsn): ?string
-    {
-        return $this->encrypt($bsn);
-    }
+//         $ontsleuteld = openssl_decrypt(base64_decode($waarde), 'AES-256-CBC', $sleutel, 0, $iv);
+//         return $ontsleuteld ?: null;
+//     }
 
-    /**
-     * Getter voor IBAN (ontsleutelt voor weergave)
-     */
-    protected function _getIban(): ?string
-    {
-        return $this->decrypt($this->_fields['iban'] ?? null);
-    }
+//     protected function _getBsn(): ?string
+//     {
+//         return $this->decrypt($this->_fields['bsn'] ?? null);
+//     }
 
-    /**
-     * Setter voor IBAN (versleutelt voor opslag)
-     */
-    protected function _setIban(?string $iban): ?string
-    {
-        return $this->encrypt($iban);
-    }
+//     protected function _setBsn(?string $bsn): ?string
+//     {
+//         return $this->encrypt($bsn);
+//     }
+
+
+//     protected function _getIban(): ?string
+//     {
+//         return $this->decrypt($this->_fields['iban'] ?? null);
+//     }
+
+
+//     protected function _setIban(?string $iban): ?string
+//     {
+//         return $this->encrypt($iban);
+//     }
 }

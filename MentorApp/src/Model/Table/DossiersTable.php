@@ -311,22 +311,21 @@ class DossiersTable extends Table
                 $actie = 'Updated';
             }
         }
-
-
+    
+        $logData = [
+            'dossier_id' => $entity->id,
+            'gebruiker_id' => $userId,
+            'actie' => $actie,
+            'beschrijving' => $beschrijving,
+            'created_at' => strftime('%Y-%m-%d %H:%M:%S')
+        ];
+    
         // Log de actie
         if (!empty($beschrijving)) {
-            $logData = [
-                'dossier_id' => $entity->id,
-                'gebruiker_id' => $userId,
-                'actie' => $actie,
-                'beschrijving' => $beschrijving
-            ];
-    
             $logEntity = $logTable->newEntity($logData);
             $logTable->save($logEntity);
         }
     }
-    
     
     public function beforeDelete(EventInterface $event, EntityInterface $entity, $options)
     {
@@ -342,12 +341,14 @@ class DossiersTable extends Table
             'dossier_id' => $entity->id,
             'gebruiker_id' => $userId,
             'actie' => 'Deleted',
-            'beschrijving' => 'Dossier verwijderd: ' . ($entity->naam ?? '[Onbekend]')
+            'beschrijving' => 'Dossier verwijderd: ' . ($entity->naam ?? '[Onbekend]'),
+            'created_at' => strftime('%Y-%m-%d %H:%M:%S')
         ];
     
         $logEntity = $logTable->newEntity($logData);
         $logTable->save($logEntity);
     }
+    
     
 }
     
