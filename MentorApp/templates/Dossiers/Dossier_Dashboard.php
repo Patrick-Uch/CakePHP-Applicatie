@@ -74,7 +74,7 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <div class="flex items-center justify-between mt-4 px-6">
+            <div class="flex items-center justify-between mt-4 px-6 mb-[10px]">
                 <div class="text-sm text-gray-700">
                     Weergave van <span class="font-medium"><?= $this->Paginator->counter('{{start}}') ?></span> 
                     tot <span class="font-medium"><?= $this->Paginator->counter('{{end}}') ?></span> 

@@ -13,6 +13,8 @@ class DocumentenController extends AppController
 
     public function index()
     {
+        // $ = $this->paginate($query);
+
         $this->set('title', 'Documenten Page');
     }
 }
