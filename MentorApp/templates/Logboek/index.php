@@ -42,11 +42,20 @@
                 <option value="Deleted" <?= $this->request->getQuery('actie') === 'Deleted' ? 'selected' : '' ?>>Verwijderd</option>
             </select>
 
-            <!-- Filter Button -->
-            <button type="submit" class="px-5 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg hover:from-blue-600 hover:to-blue-800 shadow-md transition">
-                <i class="fas fa-filter mr-2"></i> Filter toepassen
-            </button>
+            <!-- Buttons -->
+            <div class="flex gap-2">
+                <button type="submit"
+                    class="px-5 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg hover:from-blue-600 hover:to-blue-800 shadow-md transition">
+                    <i class="fas fa-filter mr-2"></i> Filter toepassen
+                </button>
+
+                <a href="<?= $this->Url->build(['controller' => 'Logboek', 'action' => 'index']) ?>"
+                    class="px-5 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg shadow-md transition inline-flex items-center">
+                    <i class="fas fa-times mr-2"></i> Reset filters
+                </a>
+            </div>
         </form>
+
 
         <!-- Log Table -->
         <div class="overflow-x-auto">

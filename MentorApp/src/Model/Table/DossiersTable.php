@@ -66,6 +66,11 @@ class DossiersTable extends Table
         $this->hasMany('Taken', [
             'foreignKey' => 'dossier_id',
         ]);
+        $this->hasMany('Documents', [
+            'foreignKey' => 'dossier_id',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
+        ]);        
     }
 
     /**

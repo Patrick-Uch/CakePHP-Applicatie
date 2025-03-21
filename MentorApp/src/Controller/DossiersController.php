@@ -23,25 +23,69 @@ class DossiersController extends AppController
     public function index()
     {
         $gebruiker = $this->Authentication->getIdentity();
-
+    
+        // redirect naar login als gebruiker niet ingelogt is
         if (!$gebruiker) {
             return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
         }
-
+    
+        // Gebruik dashboard layout
         $this->viewBuilder()->setLayout('dashboard');
-
-        // Fetch dossiers for the logged-in user's company
+    
+        $bedrijfId = $gebruiker->bedrijf_id;
         $dossiersTable = $this->fetchTable('Dossiers');
+    
+        // Haal filters op
+        $status = $this->request->getQuery('status');
+        $date = $this->request->getQuery('date');
+        $search = $this->request->getQuery('search');
+        $search = $search ? strtolower($search) : '';
+
+    
         $query = $dossiersTable->find()
-            ->where(['bedrijf_id' => $gebruiker->bedrijf_id])
-            ->contain(['Bedrijven']);
-
+            ->where(['bedrijf_id' => $bedrijfId])
+            ->contain(['Bedrijven'])
+            ->order(['Dossiers.geupdate_op' => 'DESC']);
+    
+        // Status filter
+        if (!empty($status)) {
+            $query->where(['Dossiers.status' => $status]);
+        }
+    
+        // Datum filter
+        if (!empty($date)) {
+            $now = new \DateTime();
+            switch ($date) {
+                case 'Vandaag':
+                    $start = (clone $now)->setTime(0, 0);
+                    break;
+                case 'Deze week':
+                    $start = (clone $now)->modify('-6 days');
+                    break;
+                case 'Deze maand':
+                    $start = (clone $now)->modify('-29 days');
+                    break;
+            }
+            if (isset($start)) {
+                $query->where(['Dossiers.geupdate_op >=' => $start->format('Y-m-d H:i:s')]);
+            }
+        }
+    
+        // zoek filter op naam 
+        if (!empty($search)) {
+            $query->where(function ($exp, $q) use ($search) {
+                return $exp->like('LOWER(Dossiers.naam)', "%$search%");
+            });
+        }
+        
+    
         $this->paginate = ['limit' => 10];
-
         $dossiers = $this->paginate($query);
+    
         $this->set(compact('dossiers'));
         return $this->render('/Dossiers/dossier_dashboard');
     }
+    
 
     public function add()
     {
