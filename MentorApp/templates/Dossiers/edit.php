@@ -12,7 +12,11 @@
     </div>
 
     <div class="bg-white shadow-lg rounded-lg p-6">
-        <?= $this->Form->create($dossier, ['class' => 'space-y-6']) ?>
+    <?= $this->Form->create($dossier, [
+    'type' => 'file',
+    'class' => 'space-y-6'
+]) ?>
+
 
         <!-- Bedrijf & Status -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -89,6 +93,90 @@
                 <?= $this->Form->control('betrokkenen_postcode', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
                 <?= $this->Form->control('betrokkenen_gemeente', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
             </div>
+        </div>
+
+        <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Documenten</h2>
+
+            <?php if (!empty($dossier->documents)) : ?>
+                <div class="space-y-4 mb-6">
+                    <?php foreach ($dossier->documents as $doc) : ?>
+                        <div class="flex items-center justify-between bg-white border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow transition">
+                            <div class="truncate">
+                                <a href="/<?= h($doc->path) ?>" target="_blank" class="text-blue-600 font-medium hover:underline break-all">
+                                    <?= h($doc->name) ?>
+                                </a>
+                            </div>
+                            <div class="ml-4 shrink-0">
+                                <?= $this->Form->postLink(
+                                    'Verwijder',
+                                    ['controller' => 'Documents', 'action' => 'delete', $doc->id],
+                                    ['confirm' => 'Weet je zeker dat je dit document wilt verwijderen?', 'class' => 'text-red-500 hover:text-red-700 text-sm font-medium']
+                                ) ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else : ?>
+                <p class="text-gray-500 italic mb-4">Geen documenten gekoppeld aan dit dossier.</p>
+            <?php endif; ?>
+
+
+            <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Upload nieuw document</label>
+
+            <!-- Onzichtbare File Input -->
+            <?= $this->Form->control('document[]', [
+                'type' => 'file',
+                'id' => 'actual-btn',
+                'multiple' => true,
+                'label' => false,
+                'hidden' => true
+            ]) ?>
+
+            <!-- Neppe knop -->
+            <label for="actual-btn" class="bg-blue-600 text-white py-2 px-4 rounded cursor-pointer inline-block">
+                Bestand kiezen
+            </label>
+
+            <!-- File Lijst -->
+            <div id="file-list" class="mt-3 space-y-2 text-sm text-gray-700"></div>
+            </div>
+
+            <script>
+            const actualBtn = document.getElementById('actual-btn');
+            const fileList = document.getElementById('file-list');
+
+            actualBtn.addEventListener('change', function () {
+                fileList.innerHTML = ''; // Clear previous list
+
+                Array.from(this.files).forEach((file, index) => {
+                const fileContainer = document.createElement('div');
+                fileContainer.className = "flex items-center justify-between bg-white border border-gray-300 rounded px-3 py-2";
+
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.className = 'text-red-500 text-xl leading-none hover:text-red-700';
+                removeBtn.onclick = () => {
+                    const dt = new DataTransfer();
+                    const files = Array.from(actualBtn.files).filter((_, i) => i !== index);
+                    files.forEach(f => dt.items.add(f));
+                    actualBtn.files = dt.files;
+                    actualBtn.dispatchEvent(new Event('change'));
+                };
+
+                fileContainer.appendChild(fileName);
+                fileContainer.appendChild(removeBtn);
+                fileList.appendChild(fileContainer);
+                });
+            });
+            </script>
+
+
         </div>
 
         <!-- Actieknoppen -->

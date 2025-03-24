@@ -13,10 +13,10 @@ class DossiersController extends AppController
     {
         parent::beforeFilter($event);
 
-        // Load the Authentication component
+        // Laad de Authentication component
         $this->loadComponent('Authentication.Authentication');
 
-        // Allow login and register without authentication
+        // Sta login en register toe zonder authenticatie
         $this->Authentication->addUnauthenticatedActions(['login', 'register']);
     }
 
@@ -24,7 +24,7 @@ class DossiersController extends AppController
     {
         $gebruiker = $this->Authentication->getIdentity();
     
-        // redirect naar login als gebruiker niet ingelogt is
+        // Redirect naar login als gebruiker niet ingelogd is
         if (!$gebruiker) {
             return $this->redirect(['controller' => 'Gebruikers', 'action' => 'login']);
         }
@@ -41,7 +41,7 @@ class DossiersController extends AppController
         $search = $this->request->getQuery('search');
         $search = $search ? strtolower($search) : '';
 
-    
+        // Bouw de query op basis van filters
         $query = $dossiersTable->find()
             ->where(['bedrijf_id' => $bedrijfId])
             ->contain(['Bedrijven'])
@@ -71,19 +71,18 @@ class DossiersController extends AppController
             }
         }
     
-        // zoek filter op naam 
+        // Zoek filter op naam 
         if (!empty($search)) {
             $query->where(function ($exp, $q) use ($search) {
                 return $exp->like('LOWER(Dossiers.naam)', "%$search%");
             });
         }
         
-    
+        // Pagineren van de resultaten
         $this->paginate = ['limit' => 10];
         $dossiers = $this->paginate($query);
     
         $this->set(compact('dossiers'));
-        return $this->render('/Dossiers/dossier_dashboard');
     }
     
 
@@ -104,11 +103,22 @@ class DossiersController extends AppController
             $data = $this->getRequest()->getData();
             $data['bedrijf_id'] = $bedrijf_id;
     
-            \Cake\Log\Log::debug('Data vóór encryptie: ' . json_encode($data), 'debug');
+            // Verwerk het geüploade bestand
+            $uploadedFile = $this->getRequest()->getData('document');
+            if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+                $filename = $uploadedFile->getClientFilename();
+                $filePath = WWW_ROOT . 'uploads' . DS . $filename;
+                $uploadedFile->moveTo($filePath);
     
-            $dossier = $this->Dossiers->patchEntity($dossier, $data);
+                $data['documents'] = [
+                    [
+                        'name' => $filename,
+                        'path' => 'uploads/' . $filename,
+                    ]
+                ];
+            }
     
-            \Cake\Log\Log::debug('Dossier na encryptie: ' . json_encode($dossier->toArray()), 'debug');
+            $dossier = $this->Dossiers->patchEntity($dossier, $data, ['associated' => ['Documents']]);
     
             if ($this->Dossiers->save($dossier)) {
                 $this->Flash->success(__('Het dossier is succesvol aangemaakt.'));
@@ -125,40 +135,59 @@ class DossiersController extends AppController
         $this->set(compact('dossier', 'bedrijf', 'gebruiker'));
     }
     
-
+    
     public function edit($id = null)
     {
         $this->viewBuilder()->setLayout('dashboard');
-        $dossier = $this->Dossiers->get($id, ['contain' => ['Bedrijven']]);
-    
-        $bedrijven = $this->Dossiers->Bedrijven->find('list', ['limit' => 200])->all();
+
+        // Haal het dossier op met bijbehorende bedrijven en documenten
+        $dossier = $this->Dossiers->get($id, contain: ['Bedrijven', 'Documents']);
+        $bedrijven = $this->Dossiers->Bedrijven->find('list', limit: 200)->all();
         $gebruiker = $this->Authentication->getIdentity();
-    
+        
         if ($this->getRequest()->is(['post', 'put', 'patch'])) {
             $data = $this->getRequest()->getData();
-            
-            // Debug log om te checken wat binnenkomt
-            \Cake\Log\Log::debug('Ontvangen data: ' . json_encode($data), 'debug');
-    
-            $dossier = $this->Dossiers->patchEntity($dossier, $data);
-            
-            // Debug log om te checken of encryptie werkt
-            \Cake\Log\Log::debug('Geüpdatet dossier (versleuteld): ' . json_encode($dossier->toArray()), 'debug');
-    
+            $uploadedFiles = $this->getRequest()->getData('document');
+            $dossier = $this->Dossiers->patchEntity($dossier, $data, ['associated' => ['Documents']]);
+        
             if ($this->Dossiers->save($dossier)) {
-                $this->Flash->success('Dossier is succesvol bijgewerkt.');
+
+                // Verwerk elk geüpload bestand (indien aanwezig)
+                if (!empty($uploadedFiles) && is_array($uploadedFiles)) {
+                    $documentsTable = $this->fetchTable('Documents');
+                    foreach ($uploadedFiles as $uploadedFile) {
+
+                        if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+
+                            $filename = time() . '_' . $uploadedFile->getClientFilename();
+                            $uploadPath = WWW_ROOT . 'uploads' . DS;
+
+                            if (!file_exists($uploadPath)) {
+                                mkdir($uploadPath, 0777, true);
+                            }
+                            $filePath = $uploadPath . $filename;
+                            $uploadedFile->moveTo($filePath);
+                            $document = $documentsTable->newEmptyEntity();
+                            $document->dossier_id = $dossier->id;
+                            $document->name = $filename;
+                            $document->path = 'uploads' . DS . $filename;
+                            $documentsTable->save($document);
+                        }
+                    }
+                }
+                $this->Flash->success(__('Het dossier is opgeslagen.'));
                 return $this->redirect(['action' => 'index']);
-            } else {
-                $this->Flash->error('Dossier kon niet worden bijgewerkt. Probeer opnieuw.');
             }
+            $this->Flash->error(__('Het dossier kon niet worden opgeslagen. Probeer het opnieuw.'));
         }
-    
-        $this->set(compact('dossier', 'bedrijven', 'gebruiker'));
+        
+        $this->set(compact('dossier', 'bedrijven'));
     }
     
 
     public function delete($id = null)
     {
+        // Haal het dossier op
         $dossier = $this->Dossiers->get($id);
 
         if (!$dossier) {
@@ -166,6 +195,7 @@ class DossiersController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
+        // Controleer of de gebruiker toestemming heeft om het dossier te verwijderen
         $user = $this->Authentication->getIdentity();
         if (!$user || $dossier->bedrijf_id !== $user->bedrijf_id) {
             throw new ForbiddenException('Je hebt geen toestemming om dit dossier te verwijderen.');
@@ -186,5 +216,17 @@ class DossiersController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function view($id = null)
+    {
+        $this->viewBuilder()->setLayout('dashboard');
+    
+        // Haal het dossier op met bijbehorende bedrijven en documenten
+        $dossier = $this->Dossiers->get($id, [
+            'contain' => ['Bedrijven', 'Documents']
+        ]);
+    
+        $this->set(compact('dossier'));
     }
 }

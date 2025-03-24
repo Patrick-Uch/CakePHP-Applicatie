@@ -1,9 +1,3 @@
-<?php
-/**
- * @var \App\View\AppView $this
- * @var iterable<\App\Model\Entity\Document> $documents
- */
-?>
 <div class="documents index content">
     <?= $this->Html->link(__('New Document'), ['action' => 'add'], ['class' => 'button float-right']) ?>
     <h3><?= __('Documents') ?></h3>

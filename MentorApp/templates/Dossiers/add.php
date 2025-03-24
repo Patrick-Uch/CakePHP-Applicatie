@@ -13,7 +13,11 @@
     </div>
 
     <div class="bg-white shadow-lg rounded-lg p-6">
-        <?= $this->Form->create($dossier, ['class' => 'space-y-6']) ?>
+    <?= $this->Form->create($dossier, [
+    'type' => 'file',
+    'class' => 'space-y-6'
+]) ?>
+
 
         <!-- Bedrijf & Status -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -92,6 +96,19 @@
                 <?= $this->Form->control('betrokkenen_gemeente', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
             </div>
         </div>
+
+        <!-- Document Upload -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Document Upload</h2>
+            <div class="space-y-4">
+                <label class="block text-sm font-medium text-gray-700" for="document">
+                    Upload een bestand
+                </label>
+                <input type="file" name="document" id="document"
+                    class="block w-full text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+        </div>
+
 
         <!-- Actieknoppen -->
         <div class="flex justify-end space-x-4 pt-6 border-t border-gray-300">

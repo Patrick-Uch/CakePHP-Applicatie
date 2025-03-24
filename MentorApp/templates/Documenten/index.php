@@ -14,10 +14,10 @@
             <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">id</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dossier_id</th>
                         <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Naam</th>
-                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grootte</th>
-                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Laatst gewijzigd</th>
+                        <th class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Toegevoegd</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">

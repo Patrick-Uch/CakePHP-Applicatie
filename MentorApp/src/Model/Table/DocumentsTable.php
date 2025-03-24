@@ -26,9 +26,7 @@ class DocumentsTable extends Table
             'foreignKey' => 'dossier_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Dossiers', [
-            'foreignKey' => 'dossier_id',
-        ]);
+        
     }
 
 
