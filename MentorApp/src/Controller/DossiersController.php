@@ -150,7 +150,14 @@ class DossiersController extends AppController
             $uploadedFiles = $this->getRequest()->getData('document');
             $dossier = $this->Dossiers->patchEntity($dossier, $data, ['associated' => ['Documents']]);
         
-            if ($this->Dossiers->save($dossier)) {
+
+
+            $dossier = $this->Dossiers->save($dossier);
+            
+
+            if ($dossier) {
+
+
 
                 // Verwerk elk geüpload bestand (indien aanwezig)
                 if (!empty($uploadedFiles) && is_array($uploadedFiles)) {
@@ -176,7 +183,7 @@ class DossiersController extends AppController
                     }
                 }
                 $this->Flash->success(__('Het dossier is opgeslagen.'));
-                return $this->redirect(['action' => 'index']);
+                //return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('Het dossier kon niet worden opgeslagen. Probeer het opnieuw.'));
         }
@@ -223,9 +230,8 @@ class DossiersController extends AppController
         $this->viewBuilder()->setLayout('dashboard');
     
         // Haal het dossier op met bijbehorende bedrijven en documenten
-        $dossier = $this->Dossiers->get($id, [
-            'contain' => ['Bedrijven', 'Documents']
-        ]);
+        $dossier = $this->Dossiers->get($id, contain: ['Bedrijven', 'Documents']);
+
     
         $this->set(compact('dossier'));
     }

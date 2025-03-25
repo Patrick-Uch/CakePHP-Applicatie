@@ -146,6 +146,12 @@ class DossiersTable extends Table
             ->notEmptyString('postadres_toevoeging');
 
         $validator
+           ->scalar('postadres_postcode')
+            ->maxLength('postadres_postcode', 20)
+            ->requirePresence('postadres_postcode', 'create')
+            ->notEmptyString('postadres_postcode');
+
+        $validator
             ->scalar('postadres_gemeente')
             ->maxLength('postadres_gemeente', 255)
             ->requirePresence('postadres_gemeente', 'create')
@@ -280,6 +286,16 @@ class DossiersTable extends Table
         return $rules;
     }
 
+    public function beforeSave(EventInterface $event, EntityInterface $entity, $options)
+    {
+
+        if ($entity->isNew()) {
+            $entity->gemaakt_op = date('Y-m-d H:i:s');
+        }
+    
+        $entity->geupdate_op = date('Y-m-d H:i:s');
+    }
+
     public function afterSave(EventInterface $event, EntityInterface $entity, $options)
     {
         $logTable = TableRegistry::getTableLocator()->get('Logboek');
@@ -302,14 +318,21 @@ class DossiersTable extends Table
             $updates = [];
     
             foreach ($changedFields as $field) {
+                // Specifieke afhandeling voor versleutelde velden
+                if (in_array($field, ['bsn', 'iban'])) {
+                    $updates[] = ucfirst($field) . " gewijzigd van [ENCRYPTED] naar [ENCRYPTED]";
+                    continue;
+                }
+            
                 $oldValue = $entity->getOriginal($field);
                 $newValue = $entity->get($field);
-    
+            
                 // Alleen loggen als de waarde is veranderd
                 if ($oldValue !== $newValue) {
                     $updates[] = ucfirst($field) . " gewijzigd van '{$oldValue}' naar '{$newValue}'";
                 }
             }
+            
     
             if (!empty($updates)) {
                 $beschrijving = "Dossier bijgewerkt: " . implode(", ", $updates);
@@ -322,7 +345,7 @@ class DossiersTable extends Table
             'gebruiker_id' => $userId,
             'actie' => $actie,
             'beschrijving' => $beschrijving,
-            'created_at' => strftime('%Y-%m-%d %H:%M:%S')
+            'created_at' => date('Y-m-d H:i:s')
         ];
     
         // Log de actie

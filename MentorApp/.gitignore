@@ -62,3 +62,7 @@ debug_login_log.txt
 bedrijf_debug.txt
 debug_login_log.txt
 debug_password_log.txt
+
+webroot/uploads/*
+config/crypto/*
+test_crypto.php
