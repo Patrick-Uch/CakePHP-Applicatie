@@ -42,8 +42,8 @@
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Persoonlijke Gegevens</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <?= $this->Form->control('naam', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
-                <?= $this->Form->control('bsn', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
-                <?= $this->Form->control('iban', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('bsn', ['value' => $dossier->getBsn(),'class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
+                <?= $this->Form->control('iban', ['value' => $dossier->getIban(),'class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
                 <?= $this->Form->control('email_1', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
                 <?= $this->Form->control('email_2', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>
                 <?= $this->Form->control('telefoonnummer_1', ['class' => 'w-full p-2 border border-gray-300 rounded-lg']) ?>

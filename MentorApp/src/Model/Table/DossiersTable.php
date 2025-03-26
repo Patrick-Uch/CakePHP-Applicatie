@@ -288,13 +288,12 @@ class DossiersTable extends Table
 
     public function beforeSave(EventInterface $event, EntityInterface $entity, $options)
     {
-
         if ($entity->isNew()) {
             $entity->gemaakt_op = date('Y-m-d H:i:s');
         }
-    
         $entity->geupdate_op = date('Y-m-d H:i:s');
     }
+    
 
     public function afterSave(EventInterface $event, EntityInterface $entity, $options)
     {

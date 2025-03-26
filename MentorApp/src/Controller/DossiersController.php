@@ -92,7 +92,7 @@ class DossiersController extends AppController
     
         $gebruiker = $this->Authentication->getIdentity();
         if (!$gebruiker || empty($gebruiker->bedrijf_id)) {
-            $this->Flash->error(__('Je hebt geen gekoppeld bedrijf. Neem contact op met de beheerder.'));
+            $this->Flash->error(__('Je hebt geen gekoppeld bedrijf.'));
             return $this->redirect(['controller' => 'Gebruikers', 'action' => 'index']);
         }
     
@@ -103,95 +103,82 @@ class DossiersController extends AppController
             $data = $this->getRequest()->getData();
             $data['bedrijf_id'] = $bedrijf_id;
     
-            // Verwerk het geüploade bestand
-            $uploadedFile = $this->getRequest()->getData('document');
-            if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
-                $filename = $uploadedFile->getClientFilename();
-                $filePath = WWW_ROOT . 'uploads' . DS . $filename;
-                $uploadedFile->moveTo($filePath);
-    
-                $data['documents'] = [
-                    [
-                        'name' => $filename,
-                        'path' => 'uploads/' . $filename,
-                    ]
-                ];
+            $uploadedFiles = $this->getRequest()->getData('document');
+            if ($uploadedFiles) {
+                foreach ($uploadedFiles as $uploadedFile) {
+                    if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+                        $filename = time() . '_' . $uploadedFile->getClientFilename();
+                        $uploadPath = WWW_ROOT . 'uploads' . DS;
+                        if (!file_exists($uploadPath)) {
+                            mkdir($uploadPath, 0777, true);
+                        }
+                        $uploadedFile->moveTo($uploadPath . $filename);
+                        $data['documents'][] = [
+                            'name' => $filename,
+                            'path' => 'uploads/' . $filename,
+                        ];
+                    }
+                }
             }
+    
+            // Haal bsn en iban tijdelijk eruit
+            $bsn = $data['bsn'] ?? null;
+            $iban = $data['iban'] ?? null;
+            unset($data['bsn'], $data['iban']);
     
             $dossier = $this->Dossiers->patchEntity($dossier, $data, ['associated' => ['Documents']]);
     
+            // Gebruik expliciete setters zodat encryptie plaatsvindt
+            $dossier->setBsn($bsn);
+            $dossier->setIban($iban);
+    
             if ($this->Dossiers->save($dossier)) {
-                $this->Flash->success(__('Het dossier is succesvol aangemaakt.'));
+                $this->Flash->success(__('Dossier aangemaakt.'));
                 return $this->redirect(['action' => 'index']);
             }
     
-            $this->Flash->error(__('Het dossier kon niet worden aangemaakt. Probeer het opnieuw.'));
+            $this->Flash->error(__('Het dossier kon niet worden aangemaakt.'));
         }
     
-        $bedrijf = $this->Dossiers->Bedrijven->find()
-            ->where(['id' => $bedrijf_id])
-            ->firstOrFail();
-    
+        $bedrijf = $this->Dossiers->Bedrijven->get($bedrijf_id);
         $this->set(compact('dossier', 'bedrijf', 'gebruiker'));
     }
+    
     
     
     public function edit($id = null)
     {
         $this->viewBuilder()->setLayout('dashboard');
-
-        // Haal het dossier op met bijbehorende bedrijven en documenten
+    
         $dossier = $this->Dossiers->get($id, contain: ['Bedrijven', 'Documents']);
-        $bedrijven = $this->Dossiers->Bedrijven->find('list', limit: 200)->all();
+        $bedrijven = $this->Dossiers->Bedrijven->find('list')->all();
         $gebruiker = $this->Authentication->getIdentity();
-        
+    
         if ($this->getRequest()->is(['post', 'put', 'patch'])) {
             $data = $this->getRequest()->getData();
-            $uploadedFiles = $this->getRequest()->getData('document');
+    
+            // Haal BSN en IBAN tijdelijk uit data
+            $bsn = $data['bsn'] ?? null;
+            $iban = $data['iban'] ?? null;
+            unset($data['bsn'], $data['iban']);
+    
             $dossier = $this->Dossiers->patchEntity($dossier, $data, ['associated' => ['Documents']]);
-        
-
-
-            $dossier = $this->Dossiers->save($dossier);
-            
-
-            if ($dossier) {
-
-
-
-                // Verwerk elk geüpload bestand (indien aanwezig)
-                if (!empty($uploadedFiles) && is_array($uploadedFiles)) {
-                    $documentsTable = $this->fetchTable('Documents');
-                    foreach ($uploadedFiles as $uploadedFile) {
-
-                        if ($uploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
-
-                            $filename = time() . '_' . $uploadedFile->getClientFilename();
-                            $uploadPath = WWW_ROOT . 'uploads' . DS;
-
-                            if (!file_exists($uploadPath)) {
-                                mkdir($uploadPath, 0777, true);
-                            }
-                            $filePath = $uploadPath . $filename;
-                            $uploadedFile->moveTo($filePath);
-                            $document = $documentsTable->newEmptyEntity();
-                            $document->dossier_id = $dossier->id;
-                            $document->name = $filename;
-                            $document->path = 'uploads' . DS . $filename;
-                            $documentsTable->save($document);
-                        }
-                    }
-                }
-                $this->Flash->success(__('Het dossier is opgeslagen.'));
-                //return $this->redirect(['action' => 'index']);
+    
+            // Expliciete setters voor encryptie
+            $dossier->setBsn($bsn);
+            $dossier->setIban($iban);
+    
+            if ($this->Dossiers->save($dossier)) {
+                $this->Flash->success(__('Dossier opgeslagen.'));
+                return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('Het dossier kon niet worden opgeslagen. Probeer het opnieuw.'));
+    
+            $this->Flash->error(__('Het dossier kon niet worden opgeslagen.'));
         }
-        
-        $this->set(compact('dossier', 'bedrijven'));
+    
+        $this->set(compact('dossier', 'bedrijven', 'gebruiker'));
     }
     
-
     public function delete($id = null)
     {
         // Haal het dossier op

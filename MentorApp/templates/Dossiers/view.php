@@ -35,8 +35,8 @@
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Persoonlijke Gegevens</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <?= showField('Naam', $dossier->naam) ?>
-            <?= showField('Bsn', $dossier->bsn) ?>
-            <?= showField('Iban', $dossier->iban) ?>
+            <?= showField('Bsn', $dossier->getBsn()) ?>
+            <?= showField('Iban', $dossier->getIban()) ?>
             <?= showField('Email 1', $dossier->email_1) ?>
             <?= showField('Email 2', $dossier->email_2) ?>
             <?= showField('Telefoonnummer 1', $dossier->telefoonnummer_1) ?>
