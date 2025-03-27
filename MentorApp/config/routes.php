@@ -8,10 +8,15 @@ return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
 
     $routes->scope('/', function (RouteBuilder $builder): void {
+        
+        // Default Routes
         $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+
+        // Gebruikers Routes
         $builder->connect('/gebruikers/login', ['controller' => 'Gebruikers', 'action' => 'login']);
         $builder->connect('/gebruikers/register', ['controller' => 'Gebruikers', 'action' => 'register']);
         $builder->connect('/gebruikers/logout', ['controller' => 'Gebruikers', 'action' => 'logout']);
+
         $builder->connect('/pages/*', 'Pages::display');
         $builder->fallbacks();
     });
@@ -24,12 +29,6 @@ return function (RouteBuilder $routes): void {
 
     // Documenten Routes
     $routes->connect('/documenten', ['controller' => 'Documenten', 'action' => 'index']);
-
-    // Dossiers Routes
-    //$routes->connect('/dossiers', ['controller' => 'Dossiers', 'action' => 'index']);
-    //$routes->connect('/dossiers/{section}', ['controller' => 'Dossiers', 'action' => 'view'],['pass' => ['section'], 'section' => '[a-zA-Z0-9_-]+']);
-    //$routes->connect('/dossiers/{section}/{subSection}', ['controller' => 'Dossiers', 'action' => 'view'],['pass' => ['section', 'subSection'], 'section' => '[a-zA-Z0-9_-]+', 'subSection' => '[a-zA-Z0-9_-]+']);
-    
 
     $routes->fallbacks(DashedRoute::class);
 

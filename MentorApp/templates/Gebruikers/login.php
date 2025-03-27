@@ -1,14 +1,21 @@
 <?php
-$this->disableAutoLayout(); // Disable default layout
+$this->disableAutoLayout(); // disable default layout
 ?>
 
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- lettertypes en icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <!-- aangepaste CSS  -->
     <?= $this->Html->css('app') ?>
+    
+    <!-- Laad Tailwind CSS  -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Basisinstellingen voor pagina -->
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Inloggen</title>
@@ -16,14 +23,17 @@ $this->disableAutoLayout(); // Disable default layout
 <body class="min-h-screen bg-gray-50 flex items-center justify-center font-sans">
     <div class="max-w-md w-full mx-auto p-8">
         <div class="bg-white rounded-xl shadow-sm p-8">
+            <!-- Koptekst en logo -->
             <div class="text-center mb-8">
                 <img src="<?= $this->Url->build('/uploads/logo.png') ?>" alt="Logo" class="h-12 mx-auto mb-4"/>
                 <h2 class="text-2xl font-semibold text-gray-900">Welkom terug</h2>
                 <p class="text-gray-600 mt-2">Voer je gegevens in om in te loggen</p>
             </div>
 
+            <!-- Inlogformulier -->
             <?= $this->Form->create() ?>
                 <div class="space-y-6">
+                    <!-- E-mailadres veld -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
                         <?= $this->Form->control('email', [
@@ -33,6 +43,7 @@ $this->disableAutoLayout(); // Disable default layout
                         ]) ?>
                     </div>
 
+                    <!-- Wachtwoord veld -->
                     <div>
                         <label for="wachtwoord" class="block text-sm font-medium text-gray-700 mb-1">Wachtwoord</label>
                         <?= $this->Form->control('wachtwoord', [
@@ -43,12 +54,14 @@ $this->disableAutoLayout(); // Disable default layout
                         ]) ?>
                     </div>
 
+                    <!-- Verstuur knop -->
                     <button type="submit" class="w-full bg-blue-600 text-white rounded-lg py-2.5 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         Inloggen
                     </button>
                 </div>
             <?= $this->Form->end() ?>
 
+            <!-- Link naar registerpage -->
             <p class="mt-6 text-center text-sm text-gray-600">
                 Nog geen account?
                 <?= $this->Html->link('Registreren', ['action' => 'register'], ['class' => 'font-medium text-blue-600 hover:underline']) ?>

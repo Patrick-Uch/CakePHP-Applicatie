@@ -80,10 +80,12 @@
                                 class="text-blue-600 hover:text-blue-900 mr-3">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <?= $this->Form->postLink(
+                            <?= $this->Html->link(
                                 '<i class="fas fa-trash"></i>',
-                                ['controller' => 'Dossiers', 'action' => 'delete', $dossier->id],
-                                ['confirm' => 'Weet je zeker dat je dit dossier wilt verwijderen?', 'escape' => false, 'class' => 'text-red-600 hover:text-red-900']
+                                '#',
+                                ['data-url' => $this->Url->build(['controller' => 'Dossiers', 'action' => 'delete', $dossier->id]),
+                                    'escape' => false,
+                                    'class' => 'sweet-delete text-red-600 hover:text-red-900']
                             ) ?>
                         </td>
                     </tr>

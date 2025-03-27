@@ -47,7 +47,6 @@ class DossiersTable extends Table
         $this->setTable('dossiers');
         $this->setDisplayField('status');
         $this->setPrimaryKey('id');
-
         $this->belongsTo('Bedrijven', [
             'foreignKey' => 'bedrijf_id',
             'className' => 'Bedrijven',
@@ -55,22 +54,28 @@ class DossiersTable extends Table
         ]);
         $this->hasMany('Dagboek', [
             'foreignKey' => 'dossier_id',
-        ]); 
+            'dependent' => true,
+            'cascadeCallbacks' => true,
+        ]);
         $this->hasMany('Herinneringen', [
             'foreignKey' => 'dossier_id',
-        ]);
-        $this->hasMany('Logboek', [
-            'foreignKey' => 'dossier_id',
-            'dependent' => false,
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
         $this->hasMany('Taken', [
             'foreignKey' => 'dossier_id',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
         $this->hasMany('Documents', [
             'foreignKey' => 'dossier_id',
             'dependent' => true,
             'cascadeCallbacks' => true,
-        ]);        
+        ]);
+        $this->hasMany('Logboek', [
+            'foreignKey' => 'dossier_id',
+            'dependent' => false,  // zodat de log niet verwijderd wordt bij het verwijderen van een dossier
+        ]);       
     }
 
     /**
@@ -272,13 +277,7 @@ class DossiersTable extends Table
         return $validator;
     }
 
-    /**
-     * Returns a rules checker object that will be used for validating
-     * application integrity.
-     *
-     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
-     * @return \Cake\ORM\RulesChecker
-     */
+
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['bedrijf_id'], 'Bedrijven'), ['errorField' => 'bedrijf_id']);
@@ -297,62 +296,72 @@ class DossiersTable extends Table
 
     public function afterSave(EventInterface $event, EntityInterface $entity, $options)
     {
+        // Haal de Logboek-tabel op om acties te loggen
         $logTable = TableRegistry::getTableLocator()->get('Logboek');
+    
+        // Haal de huidige gebruikers-ID uit de sessie
         $session = \Cake\Http\ServerRequestFactory::fromGlobals()->getSession();
         $userId = $session->read('Auth.id');
     
+        // Stop als er geen gebruiker is ingelogd
         if (!$userId) {
             return;
         }
     
+        // Standaardwaarden voor loggegevens
         $beschrijving = '';
         $actie = '';
     
+        // Controleer of het dossier nieuw is aangemaakt
         if ($entity->isNew()) {
             $beschrijving = 'Nieuw dossier aangemaakt: ' . ($entity->naam ?? '[Onbekend]');
             $actie = 'Created';
         } else {
-            // Bekijk voor veranderingen
+            // Als het dossier is bijgewerkt, controleer welke velden gewijzigd zijn
             $changedFields = $entity->getDirty();
             $updates = [];
     
+            // Loop door gewijzigde velden en vergelijk oude en nieuwe waarden
             foreach ($changedFields as $field) {
-                // Specifieke afhandeling voor versleutelde velden
+                // Specifieke afhandeling voor gevoelige (versleutelde) velden
                 if (in_array($field, ['bsn', 'iban'])) {
                     $updates[] = ucfirst($field) . " gewijzigd van [ENCRYPTED] naar [ENCRYPTED]";
                     continue;
                 }
-            
+    
                 $oldValue = $entity->getOriginal($field);
                 $newValue = $entity->get($field);
-            
-                // Alleen loggen als de waarde is veranderd
+    
+                // Voeg wijzigingen alleen toe als er daadwerkelijk iets veranderd is
                 if ($oldValue !== $newValue) {
                     $updates[] = ucfirst($field) . " gewijzigd van '{$oldValue}' naar '{$newValue}'";
                 }
             }
-            
     
+            // Maak beschrijving aan indien er updates zijn
             if (!empty($updates)) {
                 $beschrijving = "Dossier bijgewerkt: " . implode(", ", $updates);
                 $actie = 'Updated';
             }
         }
     
+        // Bouw de logdata-array op
         $logData = [
             'dossier_id' => $entity->id,
             'gebruiker_id' => $userId,
             'actie' => $actie,
             'beschrijving' => $beschrijving,
-            'created_at' => date('Y-m-d H:i:s')
+            'gemaakt_op' => date('Y-m-d H:i:s') 
         ];
     
-        // Log de actie
+        // Sla de log alleen op als er een beschrijving is (er daadwerkelijk iets is veranderd)
         if (!empty($beschrijving)) {
             $logEntity = $logTable->newEntity($logData);
             $logTable->save($logEntity);
         }
     }
+    
+    
     
     public function beforeDelete(EventInterface $event, EntityInterface $entity, $options)
     {
@@ -361,7 +370,7 @@ class DossiersTable extends Table
         $userId = $session->read('Auth.id');
     
         if (!$userId) {
-            return;
+            return true; // Doorgaan als er geen gebruiker is
         }
     
         $logData = [
@@ -369,12 +378,18 @@ class DossiersTable extends Table
             'gebruiker_id' => $userId,
             'actie' => 'Deleted',
             'beschrijving' => 'Dossier verwijderd: ' . ($entity->naam ?? '[Onbekend]'),
-            'created_at' => strftime('%Y-%m-%d %H:%M:%S')
+            'gemaakt_op' => date('Y-m-d H:i:s') // DIT IS HET JUISTE VELD
         ];
     
         $logEntity = $logTable->newEntity($logData);
-        $logTable->save($logEntity);
+    
+        if (!$logTable->save($logEntity)) {
+            return false; // Fout bij log opslaan
+        }
+    
+        return true; // Succesvol, doorgaan
     }
+    
     
     
 }

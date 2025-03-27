@@ -181,36 +181,44 @@ class DossiersController extends AppController
     
     public function delete($id = null)
     {
-        // Haal het dossier op
         $dossier = $this->Dossiers->get($id);
-
+    
         if (!$dossier) {
             $this->Flash->error(__('Dossier niet gevonden.'));
             return $this->redirect(['action' => 'index']);
         }
-
-        // Controleer of de gebruiker toestemming heeft om het dossier te verwijderen
+    
+        // Haal de ingelogde gebruiker op
         $user = $this->Authentication->getIdentity();
+    
+        // Controleer of gebruiker toegang heeft om dit dossier te verwijderen
         if (!$user || $dossier->bedrijf_id !== $user->bedrijf_id) {
             throw new ForbiddenException('Je hebt geen toestemming om dit dossier te verwijderen.');
         }
-
+    
         $this->Dossiers->getConnection()->begin();
-
+    
         try {
             if ($this->Dossiers->delete($dossier)) {
                 $this->Flash->success(__('Dossier succesvol verwijderd.'));
+
                 $this->Dossiers->getConnection()->commit();
+
             } else {
                 throw new \Exception('Het verwijderen van het dossier is mislukt.');
             }
         } catch (\Exception $e) {
+            // Bij error Rollback de transactie
             $this->Dossiers->getConnection()->rollback();
+            
             $this->Flash->error(__('Er is een fout opgetreden bij het verwijderen van het dossier. Probeer het opnieuw.'));
         }
-
+    
+        // Redirect
         return $this->redirect(['action' => 'index']);
     }
+    
+    
 
     public function view($id = null)
     {

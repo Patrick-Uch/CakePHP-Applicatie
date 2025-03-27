@@ -21,11 +21,12 @@
         <!-- Bedrijf & Status -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-gray-50 p-4 rounded-lg">
-                <?= $this->Form->control('bedrijf_id', [
-                    'options' => $bedrijven,
-                    'class' => 'w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500',
-                    'label' => ['text' => __('Bedrijf'), 'class' => 'block text-sm font-medium text-gray-700']
-                ]) ?>
+            <?= $this->Form->control('bedrijf_id', [
+                'options' => $bedrijven,
+                'class' => 'w-full p-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed',
+                'label' => ['text' => __('Bedrijf'), 'class' => 'block text-sm font-medium text-gray-700'],
+                'disabled' => true,
+            ]) ?>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-lg">
